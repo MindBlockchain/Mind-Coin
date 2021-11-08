@@ -1,9 +1,9 @@
 # Mind Coin
- Source Code SHA-256
+SHA-256
 
-Windows wallet link  to download and extract: 
-Mac Wallet link to download and extract: 
-Linux wallet link to download and extract: 
+Windows wallet link  to download and extract: https://github.com/MindBlockchain/Mind-Coin/blob/main/mindblockchain-qt-windows.zip 
+Mac Wallet link to download and extract: https://github.com/MindBlockchain/Mind-Coin/blob/main/mindblockchain-qt.dmg.zip
+ 
 
 
 Source branch	0.21
