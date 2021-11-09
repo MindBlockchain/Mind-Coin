@@ -1,7 +1,4 @@
 
-https://youtu.be/kRZuZnPZg6A 
-
-<br>
 # Mind Coin
 SHA-256
 <br>
