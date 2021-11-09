@@ -1,0 +1,67 @@
+#!/usr/bin/env bash
+#
+#  mindblockchaind The mindblockchain core server.
+#
+#
+# chkconfig: 345 80 20
+# description: mindblockchaind
+# processname: mindblockchaind
+#
+
+# Source function library.
+. /etc/init.d/functions
+
+# you can override defaults in /etc/sysconfig/mindblockchaind, see below
+if [ -f /etc/sysconfig/mindblockchaind ]; then
+        . /etc/sysconfig/mindblockchaind
+fi
+
+RETVAL=0
+
+prog=mindblockchaind
+# you can override the lockfile via MINDBLOCKCHAIND_LOCKFILE in /etc/sysconfig/mindblockchaind
+lockfile=${MINDBLOCKCHAIND_LOCKFILE-/var/lock/subsys/mindblockchaind}
+
+# mindblockchaind defaults to /usr/bin/mindblockchaind, override with MINDBLOCKCHAIND_BIN
+mindblockchaind=${MINDBLOCKCHAIND_BIN-/usr/bin/mindblockchaind}
+
+# mindblockchaind opts default to -disablewallet, override with MINDBLOCKCHAIND_OPTS
+mindblockchaind_opts=${MINDBLOCKCHAIND_OPTS--disablewallet}
+
+start() {
+    echo -n $"Starting $prog: "
+    daemon $DAEMONOPTS $mindblockchaind $mindblockchaind_opts
+    RETVAL=$?
+    echo
+    [ $RETVAL -eq 0 ] && touch $lockfile
+    return $RETVAL
+}
+
+stop() {
+    echo -n $"Stopping $prog: "
+    killproc $prog -t600
+    RETVAL=$?
+    echo
+    [ $RETVAL -eq 0 ] && rm -f $lockfile
+    return $RETVAL
+}
+
+case "$1" in
+    start)
+        start
+        ;;
+    stop)
+        stop
+        ;;
+    status)
+        status $prog
+        ;;
+    restart)
+        stop
+        start
+        ;;
+    *)
+        echo "Usage: service $prog {start|stop|status|restart}"
+        exit 1
+        ;;
+esac
