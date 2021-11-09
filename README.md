@@ -4,10 +4,11 @@ SHA-256
 Windows wallet link  to download and extract: https://github.com/MindBlockchain/Mind-Coin/blob/main/mindblockchain-qt-windows.zip 
 <br>
 Mac Wallet link to download and extract: https://github.com/MindBlockchain/Mind-Coin/blob/main/mindblockchain-qt.dmg.zip
- 
+
 
 
 Source branch	0.21
+<br>
 Algorithm	SHA-256 Proof of Work
 Coin name	MindBlockchain
 Coin abbreviation	MIND
