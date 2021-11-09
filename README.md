@@ -1,7 +1,8 @@
 # Mind Coin
 SHA-256
-
+<br>
 Windows wallet link  to download and extract: https://github.com/MindBlockchain/Mind-Coin/blob/main/mindblockchain-qt-windows.zip 
+<br>
 Mac Wallet link to download and extract: https://github.com/MindBlockchain/Mind-Coin/blob/main/mindblockchain-qt.dmg.zip
  
 
