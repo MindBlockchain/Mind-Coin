@@ -797,7 +797,7 @@
           <item>
            <widget class="QPushButton" name="buttonMinimizeFee">
             <property name="toolTip">
-             <string>Hide transaction fee settings</string>
+             <string>collapse fee-settings</string>
             </property>
             <property name="text">
              <string>Hide</string>
@@ -858,7 +858,7 @@ Note:  Since the fee is calculated on a per-byte basis, a fee of "100 satoshis p
                   </widget>
                  </item>
                  <item>
-                  <widget class="MindBlockchainAmountField" name="customFee"/>
+                  <widget class="BitcoinAmountField" name="customFee"/>
                  </item>
                  <item>
                   <spacer name="horizontalSpacer_6">
@@ -1072,16 +1072,6 @@ Note:  Since the fee is calculated on a per-byte basis, a fee of "100 satoshis p
              </item>
             </layout>
            </item>
-           <item>
-            <widget class="QCheckBox" name="optInRBF">
-             <property name="text">
-              <string>Enable Replace-By-Fee</string>
-             </property>
-             <property name="toolTip">
-              <string>With Replace-By-Fee (BIP-125) you can increase a transaction's fee after it is sent. Without this, a higher fee may be recommended to compensate for increased transaction delay risk.</string>
-             </property>
-            </widget>
-           </item>
           </layout>
          </widget>
         </item>
@@ -1120,7 +1110,7 @@ Note:  Since the fee is calculated on a per-byte basis, a fee of "100 satoshis p
         <string>S&amp;end</string>
        </property>
        <property name="icon">
-        <iconset resource="../mindblockchain.qrc">
+        <iconset resource="../bitcoin.qrc">
          <normaloff>:/icons/send</normaloff>:/icons/send</iconset>
        </property>
        <property name="autoDefault">
@@ -1146,7 +1136,7 @@ Note:  Since the fee is calculated on a per-byte basis, a fee of "100 satoshis p
         <string>Clear &amp;All</string>
        </property>
        <property name="icon">
-        <iconset resource="../mindblockchain.qrc">
+        <iconset resource="../bitcoin.qrc">
          <normaloff>:/icons/remove</normaloff>:/icons/remove</iconset>
        </property>
        <property name="autoDefault">
@@ -1163,7 +1153,7 @@ Note:  Since the fee is calculated on a per-byte basis, a fee of "100 satoshis p
         <string>Add &amp;Recipient</string>
        </property>
        <property name="icon">
-        <iconset resource="../mindblockchain.qrc">
+        <iconset resource="../bitcoin.qrc">
          <normaloff>:/icons/add</normaloff>:/icons/add</iconset>
        </property>
        <property name="autoDefault">
@@ -1190,7 +1180,7 @@ Note:  Since the fee is calculated on a per-byte basis, a fee of "100 satoshis p
         <number>3</number>
        </property>
        <item>
-        <widget class="QLabel" name="labelBalanceName">
+        <widget class="QLabel" name="label">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
            <horstretch>0</horstretch>
@@ -1234,14 +1224,14 @@ Note:  Since the fee is calculated on a per-byte basis, a fee of "100 satoshis p
    <header>qt/qvalidatedlineedit.h</header>
   </customwidget>
   <customwidget>
-   <class>MindBlockchainAmountField</class>
+   <class>BitcoinAmountField</class>
    <extends>QLineEdit</extends>
-   <header>qt/mindblockchainamountfield.h</header>
+   <header>qt/bitcoinamountfield.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="../mindblockchain.qrc"/>
+  <include location="../bitcoin.qrc"/>
  </resources>
  <connections/>
  <buttongroups>

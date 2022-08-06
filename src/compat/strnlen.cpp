@@ -1,9 +1,10 @@
 // Copyright (c) 2009-2018 The Bitcoin Core developers
+// Copyright (c) 2022 The Mindblockchain Core developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #if defined(HAVE_CONFIG_H)
-#include <config/mindblockchain-config.h>
+#include <config/bitcoin-config.h>
 #endif
 
 #include <cstring>

@@ -4,11 +4,10 @@
 
 DIST_SUBDIRS = secp256k1 univalue
 
-AM_LDFLAGS = $(LIBTOOL_LDFLAGS) $(HARDENED_LDFLAGS) $(GPROF_LDFLAGS) $(SANITIZER_LDFLAGS)
+AM_LDFLAGS = $(PTHREAD_CFLAGS) $(LIBTOOL_LDFLAGS) $(HARDENED_LDFLAGS) $(GPROF_LDFLAGS) $(SANITIZER_LDFLAGS)
 AM_CXXFLAGS = $(DEBUG_CXXFLAGS) $(HARDENED_CXXFLAGS) $(WARN_CXXFLAGS) $(NOWARN_CXXFLAGS) $(ERROR_CXXFLAGS) $(GPROF_CXXFLAGS) $(SANITIZER_CXXFLAGS)
 AM_CPPFLAGS = $(DEBUG_CPPFLAGS) $(HARDENED_CPPFLAGS)
 AM_LIBTOOLFLAGS = --preserve-dup-deps
-PTHREAD_FLAGS = $(PTHREAD_CFLAGS) $(PTHREAD_LIBS)
 EXTRA_LIBRARIES =
 
 if EMBEDDED_UNIVALUE
@@ -20,42 +19,43 @@ else
 LIBUNIVALUE = $(UNIVALUE_LIBS)
 endif
 
-MINDBLOCKCHAIN_INCLUDES=-I$(builddir) -I$(srcdir)/secp256k1/include $(BDB_CPPFLAGS) $(BOOST_CPPFLAGS) $(LEVELDB_CPPFLAGS)
+BITCOIN_INCLUDES=-I$(builddir) $(BDB_CPPFLAGS) $(BOOST_CPPFLAGS) $(LEVELDB_CPPFLAGS) $(CRYPTO_CFLAGS) $(SSL_CFLAGS)
 
-MINDBLOCKCHAIN_INCLUDES += $(UNIVALUE_CFLAGS)
+BITCOIN_INCLUDES += -I$(srcdir)/secp256k1/include
+BITCOIN_INCLUDES += $(UNIVALUE_CFLAGS)
 
-LIBMINDBLOCKCHAIN_SERVER=libmindblockchain_server.a
-LIBMINDBLOCKCHAIN_COMMON=libmindblockchain_common.a
-LIBMINDBLOCKCHAIN_CONSENSUS=libmindblockchain_consensus.a
-LIBMINDBLOCKCHAIN_CLI=libmindblockchain_cli.a
-LIBMINDBLOCKCHAIN_UTIL=libmindblockchain_util.a
-LIBMINDBLOCKCHAIN_CRYPTO_BASE=crypto/libmindblockchain_crypto_base.a
-LIBMINDBLOCKCHAINQT=qt/libmindblockchainqt.a
+LIBBITCOIN_SERVER=libbitcoin_server.a
+LIBBITCOIN_COMMON=libbitcoin_common.a
+LIBBITCOIN_CONSENSUS=libbitcoin_consensus.a
+LIBBITCOIN_CLI=libbitcoin_cli.a
+LIBBITCOIN_UTIL=libbitcoin_util.a
+LIBBITCOIN_CRYPTO_BASE=crypto/libbitcoin_crypto_base.a
+LIBBITCOINQT=qt/libbitcoinqt.a
 LIBSECP256K1=secp256k1/libsecp256k1.la
 
 if ENABLE_ZMQ
-LIBMINDBLOCKCHAIN_ZMQ=libmindblockchain_zmq.a
+LIBBITCOIN_ZMQ=libbitcoin_zmq.a
 endif
-if BUILD_MINDBLOCKCHAIN_LIBS
-LIBMINDBLOCKCHAINCONSENSUS=libmindblockchainconsensus.la
+if BUILD_BITCOIN_LIBS
+LIBBITCOINCONSENSUS=libbitcoinconsensus.la
 endif
 if ENABLE_WALLET
-LIBMINDBLOCKCHAIN_WALLET=libmindblockchain_wallet.a
-LIBMINDBLOCKCHAIN_WALLET_TOOL=libmindblockchain_wallet_tool.a
+LIBBITCOIN_WALLET=libbitcoin_wallet.a
+LIBBITCOIN_WALLET_TOOL=libbitcoin_wallet_tool.a
 endif
 
-LIBMINDBLOCKCHAIN_CRYPTO= $(LIBMINDBLOCKCHAIN_CRYPTO_BASE)
+LIBBITCOIN_CRYPTO= $(LIBBITCOIN_CRYPTO_BASE)
 if ENABLE_SSE41
-LIBMINDBLOCKCHAIN_CRYPTO_SSE41 = crypto/libmindblockchain_crypto_sse41.a
-LIBMINDBLOCKCHAIN_CRYPTO += $(LIBMINDBLOCKCHAIN_CRYPTO_SSE41)
+LIBBITCOIN_CRYPTO_SSE41 = crypto/libbitcoin_crypto_sse41.a
+LIBBITCOIN_CRYPTO += $(LIBBITCOIN_CRYPTO_SSE41)
 endif
 if ENABLE_AVX2
-LIBMINDBLOCKCHAIN_CRYPTO_AVX2 = crypto/libmindblockchain_crypto_avx2.a
-LIBMINDBLOCKCHAIN_CRYPTO += $(LIBMINDBLOCKCHAIN_CRYPTO_AVX2)
+LIBBITCOIN_CRYPTO_AVX2 = crypto/libbitcoin_crypto_avx2.a
+LIBBITCOIN_CRYPTO += $(LIBBITCOIN_CRYPTO_AVX2)
 endif
 if ENABLE_SHANI
-LIBMINDBLOCKCHAIN_CRYPTO_SHANI = crypto/libmindblockchain_crypto_shani.a
-LIBMINDBLOCKCHAIN_CRYPTO += $(LIBMINDBLOCKCHAIN_CRYPTO_SHANI)
+LIBBITCOIN_CRYPTO_SHANI = crypto/libbitcoin_crypto_shani.a
+LIBBITCOIN_CRYPTO += $(LIBBITCOIN_CRYPTO_SHANI)
 endif
 
 $(LIBSECP256K1): $(wildcard secp256k1/src/*.h) $(wildcard secp256k1/src/*.c) $(wildcard secp256k1/include/*)
@@ -64,83 +64,74 @@ $(LIBSECP256K1): $(wildcard secp256k1/src/*.h) $(wildcard secp256k1/src/*.c) $(w
 # Make is not made aware of per-object dependencies to avoid limiting building parallelization
 # But to build the less dependent modules first, we manually select their order here:
 EXTRA_LIBRARIES += \
-  $(LIBMINDBLOCKCHAIN_CRYPTO) \
-  $(LIBMINDBLOCKCHAIN_UTIL) \
-  $(LIBMINDBLOCKCHAIN_COMMON) \
-  $(LIBMINDBLOCKCHAIN_CONSENSUS) \
-  $(LIBMINDBLOCKCHAIN_SERVER) \
-  $(LIBMINDBLOCKCHAIN_CLI) \
-  $(LIBMINDBLOCKCHAIN_WALLET) \
-  $(LIBMINDBLOCKCHAIN_WALLET_TOOL) \
-  $(LIBMINDBLOCKCHAIN_ZMQ)
+  $(LIBBITCOIN_CRYPTO) \
+  $(LIBBITCOIN_UTIL) \
+  $(LIBBITCOIN_COMMON) \
+  $(LIBBITCOIN_CONSENSUS) \
+  $(LIBBITCOIN_SERVER) \
+  $(LIBBITCOIN_CLI) \
+  $(LIBBITCOIN_WALLET) \
+  $(LIBBITCOIN_WALLET_TOOL) \
+  $(LIBBITCOIN_ZMQ)
 
-lib_LTLIBRARIES = $(LIBMINDBLOCKCHAINCONSENSUS)
+lib_LTLIBRARIES = $(LIBBITCOINCONSENSUS)
 
 bin_PROGRAMS =
 noinst_PROGRAMS =
 TESTS =
 BENCHMARKS =
 
-if BUILD_MINDBLOCKCHAIND
+if BUILD_BITCOIND
   bin_PROGRAMS += mindblockchaind
 endif
 
-if BUILD_MINDBLOCKCHAIN_NODE
-  bin_PROGRAMS += mindblockchain-node
-endif
-
-if BUILD_MINDBLOCKCHAIN_CLI
+if BUILD_BITCOIN_CLI
   bin_PROGRAMS += mindblockchain-cli
 endif
-if BUILD_MINDBLOCKCHAIN_TX
+if BUILD_BITCOIN_TX
   bin_PROGRAMS += mindblockchain-tx
 endif
 if ENABLE_WALLET
-if BUILD_MINDBLOCKCHAIN_WALLET
+if BUILD_BITCOIN_WALLET
   bin_PROGRAMS += mindblockchain-wallet
 endif
 endif
 
 .PHONY: FORCE check-symbols check-security
-# mindblockchain core #
-MINDBLOCKCHAIN_CORE_H = \
+# bitcoin core #
+BITCOIN_CORE_H = \
   addrdb.h \
   addrman.h \
   attributes.h \
   banman.h \
   base58.h \
   bech32.h \
+  bloom.h \
   blockencodings.h \
   blockfilter.h \
-  bloom.h \
   chain.h \
   chainparams.h \
   chainparamsbase.h \
   chainparamsseeds.h \
+  checkpoints.h \
   checkqueue.h \
   clientversion.h \
   coins.h \
   compat.h \
   compat/assumptions.h \
   compat/byteswap.h \
-  compat/cpuid.h \
   compat/endian.h \
   compat/sanity.h \
   compressor.h \
   consensus/consensus.h \
-  consensus/tx_check.h \
   consensus/tx_verify.h \
   core_io.h \
   core_memusage.h \
   cuckoocache.h \
-  dbwrapper.h \
-  flatfile.h \
   fs.h \
   httprpc.h \
   httpserver.h \
   index/base.h \
-  index/blockfilterindex.h \
-  index/disktxpos.h \
   index/txindex.h \
   indirectmap.h \
   init.h \
@@ -150,25 +141,19 @@ MINDBLOCKCHAIN_CORE_H = \
   interfaces/wallet.h \
   key.h \
   key_io.h \
+  keystore.h \
+  dbwrapper.h \
+  limitedmap.h \
   logging.h \
-  logging/timer.h \
   memusage.h \
   merkleblock.h \
   miner.h \
   net.h \
-  net_permissions.h \
   net_processing.h \
-  net_types.h \
   netaddress.h \
   netbase.h \
   netmessagemaker.h \
-  node/coin.h \
-  node/coinstats.h \
-  node/context.h \
-  node/psbt.h \
   node/transaction.h \
-  node/ui_interface.h \
-  node/utxo_snapshot.h \
   noui.h \
   optional.h \
   outputtype.h \
@@ -176,31 +161,27 @@ MINDBLOCKCHAIN_CORE_H = \
   policy/fees.h \
   policy/policy.h \
   policy/rbf.h \
-  policy/settings.h \
   pow.h \
   protocol.h \
   psbt.h \
   random.h \
-  randomenv.h \
   reverse_iterator.h \
+  reverselock.h \
   rpc/blockchain.h \
   rpc/client.h \
   rpc/mining.h \
   rpc/protocol.h \
-  rpc/rawtransaction_util.h \
-  rpc/register.h \
-  rpc/request.h \
   rpc/server.h \
+  rpc/rawtransaction.h \
+  rpc/register.h \
   rpc/util.h \
   scheduler.h \
   script/descriptor.h \
-  script/keyorigin.h \
+  script/ismine.h \
   script/sigcache.h \
   script/sign.h \
-  script/signingprovider.h \
   script/standard.h \
   shutdown.h \
-  signet.h \
   streams.h \
   support/allocators/secure.h \
   support/allocators/zeroafterfree.h \
@@ -208,111 +189,83 @@ MINDBLOCKCHAIN_CORE_H = \
   support/events.h \
   support/lockedpool.h \
   sync.h \
-  threadinterrupt.h \
   threadsafety.h \
+  threadinterrupt.h \
   timedata.h \
   torcontrol.h \
   txdb.h \
-  txrequest.h \
   txmempool.h \
+  ui_interface.h \
   undo.h \
-  util/asmap.h \
   util/bip32.h \
   util/bytevectorhash.h \
-  util/check.h \
-  util/error.h \
-  util/fees.h \
-  util/golombrice.h \
-  util/macros.h \
-  util/memory.h \
-  util/message.h \
-  util/moneystr.h \
-  util/rbf.h \
-  util/ref.h \
-  util/settings.h \
-  util/spanparsing.h \
-  util/string.h \
   util/system.h \
-  util/threadnames.h \
+  util/memory.h \
+  util/moneystr.h \
   util/time.h \
-  util/translation.h \
-  util/ui_change_type.h \
-  util/url.h \
-  util/vector.h \
   validation.h \
   validationinterface.h \
   versionbits.h \
   versionbitsinfo.h \
-  wallet/bdb.h \
+  walletinitinterface.h \
   wallet/coincontrol.h \
-  wallet/coinselection.h \
-  wallet/context.h \
   wallet/crypter.h \
   wallet/db.h \
   wallet/feebumper.h \
   wallet/fees.h \
-  wallet/ismine.h \
-  wallet/load.h \
+  wallet/psbtwallet.h \
   wallet/rpcwallet.h \
-  wallet/salvage.h \
-  wallet/scriptpubkeyman.h \
-  wallet/sqlite.h \
   wallet/wallet.h \
   wallet/walletdb.h \
   wallet/wallettool.h \
   wallet/walletutil.h \
-  walletinitinterface.h \
+  wallet/coinselection.h \
   warnings.h \
   zmq/zmqabstractnotifier.h \
+  zmq/zmqconfig.h\
   zmq/zmqnotificationinterface.h \
   zmq/zmqpublishnotifier.h \
-  zmq/zmqrpc.h \
-  zmq/zmqutil.h
+  zmq/zmqrpc.h
 
 
 obj/build.h: FORCE
 	@$(MKDIR_P) $(builddir)/obj
 	@$(top_srcdir)/share/genbuild.sh "$(abs_top_builddir)/src/obj/build.h" \
 	  "$(abs_top_srcdir)"
-libmindblockchain_util_a-clientversion.$(OBJEXT): obj/build.h
+libbitcoin_util_a-clientversion.$(OBJEXT): obj/build.h
 
-# server: shared between mindblockchaind and mindblockchain-qt
-# Contains code accessing mempool and chain state that is meant to be separated
-# from wallet and gui code (see node/README.md). Shared code should go in
-# libmindblockchain_common or libmindblockchain_util libraries, instead.
-libmindblockchain_server_a_CPPFLAGS = $(AM_CPPFLAGS) $(MINDBLOCKCHAIN_INCLUDES) $(MINIUPNPC_CPPFLAGS) $(EVENT_CFLAGS) $(EVENT_PTHREADS_CFLAGS)
-libmindblockchain_server_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
-libmindblockchain_server_a_SOURCES = \
+# server: shared between bitcoind and bitcoin-qt
+libbitcoin_server_a_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES) $(MINIUPNPC_CPPFLAGS) $(EVENT_CFLAGS) $(EVENT_PTHREADS_CFLAGS)
+libbitcoin_server_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
+libbitcoin_server_a_SOURCES = \
   addrdb.cpp \
   addrman.cpp \
   banman.cpp \
+  bloom.cpp \
   blockencodings.cpp \
   blockfilter.cpp \
   chain.cpp \
+  checkpoints.cpp \
   consensus/tx_verify.cpp \
-  dbwrapper.cpp \
-  flatfile.cpp \
   httprpc.cpp \
   httpserver.cpp \
   index/base.cpp \
-  index/blockfilterindex.cpp \
   index/txindex.cpp \
-  init.cpp \
   interfaces/chain.cpp \
+  interfaces/handler.cpp \
   interfaces/node.cpp \
+  init.cpp \
+  dbwrapper.cpp \
+  merkleblock.cpp \
   miner.cpp \
   net.cpp \
   net_processing.cpp \
-  node/coin.cpp \
-  node/coinstats.cpp \
-  node/context.cpp \
-  node/psbt.cpp \
   node/transaction.cpp \
-  node/ui_interface.cpp \
   noui.cpp \
+  outputtype.cpp \
   policy/fees.cpp \
+  policy/policy.cpp \
   policy/rbf.cpp \
-  policy/settings.cpp \
   pow.cpp \
   rest.cpp \
   rpc/blockchain.cpp \
@@ -321,137 +274,120 @@ libmindblockchain_server_a_SOURCES = \
   rpc/net.cpp \
   rpc/rawtransaction.cpp \
   rpc/server.cpp \
+  rpc/util.cpp \
   script/sigcache.cpp \
   shutdown.cpp \
-  signet.cpp \
   timedata.cpp \
   torcontrol.cpp \
   txdb.cpp \
-  txrequest.cpp \
   txmempool.cpp \
+  ui_interface.cpp \
   validation.cpp \
   validationinterface.cpp \
   versionbits.cpp \
-  $(MINDBLOCKCHAIN_CORE_H)
+  $(BITCOIN_CORE_H)
 
-if ENABLE_WALLET
-libmindblockchain_server_a_SOURCES += wallet/init.cpp
-endif
 if !ENABLE_WALLET
-libmindblockchain_server_a_SOURCES += dummywallet.cpp
+libbitcoin_server_a_SOURCES += dummywallet.cpp
 endif
 
 if ENABLE_ZMQ
-libmindblockchain_zmq_a_CPPFLAGS = $(AM_CPPFLAGS) $(MINDBLOCKCHAIN_INCLUDES) $(ZMQ_CFLAGS)
-libmindblockchain_zmq_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
-libmindblockchain_zmq_a_SOURCES = \
+libbitcoin_zmq_a_CPPFLAGS = $(BITCOIN_INCLUDES) $(ZMQ_CFLAGS)
+libbitcoin_zmq_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
+libbitcoin_zmq_a_SOURCES = \
   zmq/zmqabstractnotifier.cpp \
   zmq/zmqnotificationinterface.cpp \
   zmq/zmqpublishnotifier.cpp \
-  zmq/zmqrpc.cpp \
-  zmq/zmqutil.cpp
+  zmq/zmqrpc.cpp
 endif
 
 
-# wallet: shared between mindblockchaind and mindblockchain-qt, but only linked
+# wallet: shared between bitcoind and bitcoin-qt, but only linked
 # when wallet enabled
-libmindblockchain_wallet_a_CPPFLAGS = $(AM_CPPFLAGS) $(MINDBLOCKCHAIN_INCLUDES) $(SQLITE_CFLAGS)
-libmindblockchain_wallet_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
-libmindblockchain_wallet_a_SOURCES = \
+libbitcoin_wallet_a_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES)
+libbitcoin_wallet_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
+libbitcoin_wallet_a_SOURCES = \
   interfaces/wallet.cpp \
-  wallet/bdb.cpp \
   wallet/coincontrol.cpp \
-  wallet/context.cpp \
   wallet/crypter.cpp \
   wallet/db.cpp \
   wallet/feebumper.cpp \
   wallet/fees.cpp \
-  wallet/load.cpp \
+  wallet/init.cpp \
+  wallet/psbtwallet.cpp \
   wallet/rpcdump.cpp \
   wallet/rpcwallet.cpp \
-  wallet/salvage.cpp \
-  wallet/scriptpubkeyman.cpp \
   wallet/wallet.cpp \
   wallet/walletdb.cpp \
   wallet/walletutil.cpp \
   wallet/coinselection.cpp \
-  $(MINDBLOCKCHAIN_CORE_H)
+  $(BITCOIN_CORE_H)
 
-if USE_SQLITE
-libmindblockchain_wallet_a_SOURCES += wallet/sqlite.cpp
-endif
-
-libmindblockchain_wallet_tool_a_CPPFLAGS = $(AM_CPPFLAGS) $(MINDBLOCKCHAIN_INCLUDES)
-libmindblockchain_wallet_tool_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
-libmindblockchain_wallet_tool_a_SOURCES = \
+libbitcoin_wallet_tool_a_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES)
+libbitcoin_wallet_tool_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
+libbitcoin_wallet_tool_a_SOURCES = \
   wallet/wallettool.cpp \
-  $(MINDBLOCKCHAIN_CORE_H)
+  $(BITCOIN_CORE_H)
 
 # crypto primitives library
-crypto_libmindblockchain_crypto_base_a_CPPFLAGS = $(AM_CPPFLAGS)
-crypto_libmindblockchain_crypto_base_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
-crypto_libmindblockchain_crypto_base_a_SOURCES = \
+crypto_libbitcoin_crypto_base_a_CPPFLAGS = $(AM_CPPFLAGS) $(SSL_CFLAGS)
+crypto_libbitcoin_crypto_base_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
+crypto_libbitcoin_crypto_base_a_SOURCES = \
   crypto/aes.cpp \
   crypto/aes.h \
-  crypto/chacha_poly_aead.h \
-  crypto/chacha_poly_aead.cpp \
   crypto/chacha20.h \
   crypto/chacha20.cpp \
   crypto/common.h \
-  crypto/hkdf_sha256_32.cpp \
-  crypto/hkdf_sha256_32.h \
   crypto/hmac_sha256.cpp \
   crypto/hmac_sha256.h \
   crypto/hmac_sha512.cpp \
   crypto/hmac_sha512.h \
-  crypto/poly1305.h \
-  crypto/poly1305.cpp \
   crypto/ripemd160.cpp \
   crypto/ripemd160.h \
+  crypto/scrypt.cpp \
+  crypto/scrypt-sse2.cpp \
+  crypto/scrypt.h \
   crypto/sha1.cpp \
   crypto/sha1.h \
   crypto/sha256.cpp \
   crypto/sha256.h \
-  crypto/sha3.cpp \
-  crypto/sha3.h \
   crypto/sha512.cpp \
   crypto/sha512.h \
   crypto/siphash.cpp \
   crypto/siphash.h
 
 if USE_ASM
-crypto_libmindblockchain_crypto_base_a_SOURCES += crypto/sha256_sse4.cpp
+crypto_libbitcoin_crypto_base_a_SOURCES += crypto/sha256_sse4.cpp
 endif
 
-crypto_libmindblockchain_crypto_sse41_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
-crypto_libmindblockchain_crypto_sse41_a_CPPFLAGS = $(AM_CPPFLAGS)
-crypto_libmindblockchain_crypto_sse41_a_CXXFLAGS += $(SSE41_CXXFLAGS)
-crypto_libmindblockchain_crypto_sse41_a_CPPFLAGS += -DENABLE_SSE41
-crypto_libmindblockchain_crypto_sse41_a_SOURCES = crypto/sha256_sse41.cpp
+crypto_libbitcoin_crypto_sse41_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
+crypto_libbitcoin_crypto_sse41_a_CPPFLAGS = $(AM_CPPFLAGS)
+crypto_libbitcoin_crypto_sse41_a_CXXFLAGS += $(SSE41_CXXFLAGS)
+crypto_libbitcoin_crypto_sse41_a_CPPFLAGS += -DENABLE_SSE41
+crypto_libbitcoin_crypto_sse41_a_SOURCES = crypto/sha256_sse41.cpp
 
-crypto_libmindblockchain_crypto_avx2_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
-crypto_libmindblockchain_crypto_avx2_a_CPPFLAGS = $(AM_CPPFLAGS)
-crypto_libmindblockchain_crypto_avx2_a_CXXFLAGS += $(AVX2_CXXFLAGS)
-crypto_libmindblockchain_crypto_avx2_a_CPPFLAGS += -DENABLE_AVX2
-crypto_libmindblockchain_crypto_avx2_a_SOURCES = crypto/sha256_avx2.cpp
+crypto_libbitcoin_crypto_avx2_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
+crypto_libbitcoin_crypto_avx2_a_CPPFLAGS = $(AM_CPPFLAGS)
+crypto_libbitcoin_crypto_avx2_a_CXXFLAGS += $(AVX2_CXXFLAGS)
+crypto_libbitcoin_crypto_avx2_a_CPPFLAGS += -DENABLE_AVX2
+crypto_libbitcoin_crypto_avx2_a_SOURCES = crypto/sha256_avx2.cpp
 
-crypto_libmindblockchain_crypto_shani_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
-crypto_libmindblockchain_crypto_shani_a_CPPFLAGS = $(AM_CPPFLAGS)
-crypto_libmindblockchain_crypto_shani_a_CXXFLAGS += $(SHANI_CXXFLAGS)
-crypto_libmindblockchain_crypto_shani_a_CPPFLAGS += -DENABLE_SHANI
-crypto_libmindblockchain_crypto_shani_a_SOURCES = crypto/sha256_shani.cpp
+crypto_libbitcoin_crypto_shani_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
+crypto_libbitcoin_crypto_shani_a_CPPFLAGS = $(AM_CPPFLAGS)
+crypto_libbitcoin_crypto_shani_a_CXXFLAGS += $(SHANI_CXXFLAGS)
+crypto_libbitcoin_crypto_shani_a_CPPFLAGS += -DENABLE_SHANI
+crypto_libbitcoin_crypto_shani_a_SOURCES = crypto/sha256_shani.cpp
 
 # consensus: shared between all executables that validate any consensus rules.
-libmindblockchain_consensus_a_CPPFLAGS = $(AM_CPPFLAGS) $(MINDBLOCKCHAIN_INCLUDES)
-libmindblockchain_consensus_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
-libmindblockchain_consensus_a_SOURCES = \
+libbitcoin_consensus_a_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES)
+libbitcoin_consensus_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
+libbitcoin_consensus_a_SOURCES = \
   amount.h \
   arith_uint256.cpp \
   arith_uint256.h \
   consensus/merkle.cpp \
   consensus/merkle.h \
   consensus/params.h \
-  consensus/tx_check.cpp \
   consensus/validation.h \
   hash.cpp \
   hash.h \
@@ -462,7 +398,7 @@ libmindblockchain_consensus_a_SOURCES = \
   primitives/transaction.h \
   pubkey.cpp \
   pubkey.h \
-  script/mindblockchainconsensus.cpp \
+  script/bitcoinconsensus.cpp \
   script/interpreter.cpp \
   script/interpreter.h \
   script/script.cpp \
@@ -478,13 +414,12 @@ libmindblockchain_consensus_a_SOURCES = \
   util/strencodings.h \
   version.h
 
-# common: shared between mindblockchaind, and mindblockchain-qt and non-server tools
-libmindblockchain_common_a_CPPFLAGS = $(AM_CPPFLAGS) $(MINDBLOCKCHAIN_INCLUDES)
-libmindblockchain_common_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
-libmindblockchain_common_a_SOURCES = \
+# common: shared between bitcoind, and bitcoin-qt and non-server tools
+libbitcoin_common_a_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES)
+libbitcoin_common_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
+libbitcoin_common_a_SOURCES = \
   base58.cpp \
   bech32.cpp \
-  bloom.cpp \
   chainparams.cpp \
   coins.cpp \
   compressor.cpp \
@@ -492,32 +427,27 @@ libmindblockchain_common_a_SOURCES = \
   core_write.cpp \
   key.cpp \
   key_io.cpp \
-  merkleblock.cpp \
+  keystore.cpp \
   netaddress.cpp \
   netbase.cpp \
-  net_permissions.cpp \
-  outputtype.cpp \
   policy/feerate.cpp \
-  policy/policy.cpp \
-  protocol.cpp \
   psbt.cpp \
-  rpc/rawtransaction_util.cpp \
-  rpc/util.cpp \
+  protocol.cpp \
   scheduler.cpp \
   script/descriptor.cpp \
+  script/ismine.cpp \
   script/sign.cpp \
-  script/signingprovider.cpp \
   script/standard.cpp \
   versionbitsinfo.cpp \
   warnings.cpp \
-  $(MINDBLOCKCHAIN_CORE_H)
+  $(BITCOIN_CORE_H)
 
 # util: shared between all executables.
 # This library *must* be included to make sure that the glibc
 # backward-compatibility objects and their sanity checks are linked.
-libmindblockchain_util_a_CPPFLAGS = $(AM_CPPFLAGS) $(MINDBLOCKCHAIN_INCLUDES)
-libmindblockchain_util_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
-libmindblockchain_util_a_SOURCES = \
+libbitcoin_util_a_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES)
+libbitcoin_util_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
+libbitcoin_util_a_SOURCES = \
   support/lockedpool.cpp \
   chainparamsbase.cpp \
   clientversion.cpp \
@@ -525,154 +455,141 @@ libmindblockchain_util_a_SOURCES = \
   compat/glibcxx_sanity.cpp \
   compat/strnlen.cpp \
   fs.cpp \
-  interfaces/handler.cpp \
   logging.cpp \
   random.cpp \
-  randomenv.cpp \
-  rpc/request.cpp \
+  rpc/protocol.cpp \
   support/cleanse.cpp \
   sync.cpp \
   threadinterrupt.cpp \
-  util/asmap.cpp \
   util/bip32.cpp \
   util/bytevectorhash.cpp \
-  util/error.cpp \
-  util/fees.cpp \
   util/system.cpp \
-  util/message.cpp \
   util/moneystr.cpp \
-  util/rbf.cpp \
-  util/settings.cpp \
-  util/threadnames.cpp \
-  util/spanparsing.cpp \
   util/strencodings.cpp \
-  util/string.cpp \
   util/time.cpp \
-  $(MINDBLOCKCHAIN_CORE_H)
-
-if USE_LIBEVENT
-libmindblockchain_util_a_SOURCES += util/url.cpp
-endif
+  $(BITCOIN_CORE_H)
 
 if GLIBC_BACK_COMPAT
-libmindblockchain_util_a_SOURCES += compat/glibc_compat.cpp
+libbitcoin_util_a_SOURCES += compat/glibc_compat.cpp
 AM_LDFLAGS += $(COMPAT_LDFLAGS)
 endif
 
-# cli: shared between mindblockchain-cli and mindblockchain-qt
-libmindblockchain_cli_a_CPPFLAGS = $(AM_CPPFLAGS) $(MINDBLOCKCHAIN_INCLUDES)
-libmindblockchain_cli_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
-libmindblockchain_cli_a_SOURCES = \
-  compat/stdin.h \
-  compat/stdin.cpp \
+# cli: shared between bitcoin-cli and bitcoin-qt
+libbitcoin_cli_a_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES)
+libbitcoin_cli_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
+libbitcoin_cli_a_SOURCES = \
   rpc/client.cpp \
-  $(MINDBLOCKCHAIN_CORE_H)
+  $(BITCOIN_CORE_H)
 
-nodist_libmindblockchain_util_a_SOURCES = $(srcdir)/obj/build.h
+nodist_libbitcoin_util_a_SOURCES = $(srcdir)/obj/build.h
 #
 
-# mindblockchaind & mindblockchain-node binaries #
-mindblockchain_daemon_sources = mindblockchaind.cpp
-mindblockchain_bin_cppflags = $(AM_CPPFLAGS) $(MINDBLOCKCHAIN_INCLUDES)
-mindblockchain_bin_cxxflags = $(AM_CXXFLAGS) $(PIE_FLAGS)
-mindblockchain_bin_ldflags = $(RELDFLAGS) $(AM_LDFLAGS) $(LIBTOOL_APP_LDFLAGS) $(PTHREAD_FLAGS)
+# bitcoind binary #
+mindblockchaind_SOURCES = bitcoind.cpp
+mindblockchaind_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES)
+mindblockchaind_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
+mindblockchaind_LDFLAGS = $(RELDFLAGS) $(AM_LDFLAGS) $(LIBTOOL_APP_LDFLAGS)
 
 if TARGET_WINDOWS
-mindblockchain_daemon_sources += mindblockchaind-res.rc
+mindblockchaind_SOURCES += bitcoind-res.rc
 endif
 
-mindblockchain_bin_ldadd = \
-  $(LIBMINDBLOCKCHAIN_WALLET) \
-  $(LIBMINDBLOCKCHAIN_COMMON) \
-  $(LIBMINDBLOCKCHAIN_UTIL) \
+mindblockchaind_LDADD = \
+  $(LIBBITCOIN_SERVER) \
+  $(LIBBITCOIN_WALLET) \
+  $(LIBBITCOIN_SERVER) \
+  $(LIBBITCOIN_COMMON) \
   $(LIBUNIVALUE) \
-  $(LIBMINDBLOCKCHAIN_ZMQ) \
-  $(LIBMINDBLOCKCHAIN_CONSENSUS) \
-  $(LIBMINDBLOCKCHAIN_CRYPTO) \
+  $(LIBBITCOIN_UTIL) \
+  $(LIBBITCOIN_ZMQ) \
+  $(LIBBITCOIN_CONSENSUS) \
+  $(LIBBITCOIN_CRYPTO) \
   $(LIBLEVELDB) \
   $(LIBLEVELDB_SSE42) \
   $(LIBMEMENV) \
   $(LIBSECP256K1)
 
-mindblockchain_bin_ldadd += $(BOOST_LIBS) $(BDB_LIBS) $(MINIUPNPC_LIBS) $(EVENT_PTHREADS_LIBS) $(EVENT_LIBS) $(ZMQ_LIBS) $(SQLITE_LIBS)
+mindblockchaind_LDADD += $(BOOST_LIBS) $(BDB_LIBS) $(CRYPTO_LIBS) $(MINIUPNPC_LIBS) $(EVENT_PTHREADS_LIBS) $(EVENT_LIBS) $(ZMQ_LIBS)
 
-mindblockchaind_SOURCES = $(mindblockchain_daemon_sources)
-mindblockchaind_CPPFLAGS = $(mindblockchain_bin_cppflags)
-mindblockchaind_CXXFLAGS = $(mindblockchain_bin_cxxflags)
-mindblockchaind_LDFLAGS = $(mindblockchain_bin_ldflags)
-mindblockchaind_LDADD = $(LIBMINDBLOCKCHAIN_SERVER) $(mindblockchain_bin_ldadd)
-
-mindblockchain_node_SOURCES = $(mindblockchain_daemon_sources)
-mindblockchain_node_CPPFLAGS = $(mindblockchain_bin_cppflags)
-mindblockchain_node_CXXFLAGS = $(mindblockchain_bin_cxxflags)
-mindblockchain_node_LDFLAGS = $(mindblockchain_bin_ldflags)
-mindblockchain_node_LDADD = $(LIBMINDBLOCKCHAIN_SERVER) $(mindblockchain_bin_ldadd)
-
-# mindblockchain-cli binary #
-mindblockchain_cli_SOURCES = mindblockchain-cli.cpp
-mindblockchain_cli_CPPFLAGS = $(AM_CPPFLAGS) $(MINDBLOCKCHAIN_INCLUDES) $(EVENT_CFLAGS)
+# bitcoin-cli binary #
+mindblockchain_cli_SOURCES = bitcoin-cli.cpp
+mindblockchain_cli_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES) $(EVENT_CFLAGS)
 mindblockchain_cli_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
-mindblockchain_cli_LDFLAGS = $(RELDFLAGS) $(AM_LDFLAGS) $(LIBTOOL_APP_LDFLAGS) $(PTHREAD_FLAGS)
+mindblockchain_cli_LDFLAGS = $(RELDFLAGS) $(AM_LDFLAGS) $(LIBTOOL_APP_LDFLAGS)
 
 if TARGET_WINDOWS
-mindblockchain_cli_SOURCES += mindblockchain-cli-res.rc
+mindblockchain_cli_SOURCES += bitcoin-cli-res.rc
 endif
 
 mindblockchain_cli_LDADD = \
-  $(LIBMINDBLOCKCHAIN_CLI) \
+  $(LIBBITCOIN_CLI) \
   $(LIBUNIVALUE) \
-  $(LIBMINDBLOCKCHAIN_UTIL) \
-  $(LIBMINDBLOCKCHAIN_CRYPTO)
+  $(LIBBITCOIN_UTIL) \
+  $(LIBBITCOIN_CRYPTO)
 
-mindblockchain_cli_LDADD += $(BOOST_LIBS) $(EVENT_LIBS)
+mindblockchain_cli_LDADD += $(BOOST_LIBS) $(CRYPTO_LIBS) $(EVENT_LIBS)
 #
 
-# mindblockchain-tx binary #
-mindblockchain_tx_SOURCES = mindblockchain-tx.cpp
-mindblockchain_tx_CPPFLAGS = $(AM_CPPFLAGS) $(MINDBLOCKCHAIN_INCLUDES)
+# bitcoin-tx binary #
+mindblockchain_tx_SOURCES = bitcoin-tx.cpp
+mindblockchain_tx_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES)
 mindblockchain_tx_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
-mindblockchain_tx_LDFLAGS = $(RELDFLAGS) $(AM_LDFLAGS) $(LIBTOOL_APP_LDFLAGS) $(PTHREAD_FLAGS)
+mindblockchain_tx_LDFLAGS = $(RELDFLAGS) $(AM_LDFLAGS) $(LIBTOOL_APP_LDFLAGS)
 
 if TARGET_WINDOWS
-mindblockchain_tx_SOURCES += mindblockchain-tx-res.rc
+mindblockchain_tx_SOURCES += bitcoin-tx-res.rc
 endif
 
 mindblockchain_tx_LDADD = \
   $(LIBUNIVALUE) \
-  $(LIBMINDBLOCKCHAIN_COMMON) \
-  $(LIBMINDBLOCKCHAIN_UTIL) \
-  $(LIBMINDBLOCKCHAIN_CONSENSUS) \
-  $(LIBMINDBLOCKCHAIN_CRYPTO) \
+  $(LIBBITCOIN_COMMON) \
+  $(LIBBITCOIN_UTIL) \
+  $(LIBBITCOIN_CONSENSUS) \
+  $(LIBBITCOIN_CRYPTO) \
   $(LIBSECP256K1)
 
-mindblockchain_tx_LDADD += $(BOOST_LIBS)
+mindblockchain_tx_LDADD += $(BOOST_LIBS) $(CRYPTO_LIBS)
 #
 
-# mindblockchain-wallet binary #
-mindblockchain_wallet_SOURCES = mindblockchain-wallet.cpp
-mindblockchain_wallet_CPPFLAGS = $(mindblockchain_bin_cppflags)
-mindblockchain_wallet_CXXFLAGS = $(mindblockchain_bin_cxxflags)
-mindblockchain_wallet_LDFLAGS = $(mindblockchain_bin_ldflags)
-mindblockchain_wallet_LDADD = $(LIBMINDBLOCKCHAIN_WALLET_TOOL) $(mindblockchain_bin_ldadd)
+# bitcoin-wallet binary #
+mindblockchain_wallet_SOURCES = bitcoin-wallet.cpp
+mindblockchain_wallet_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES)
+mindblockchain_wallet_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
+mindblockchain_wallet_LDFLAGS = $(RELDFLAGS) $(AM_LDFLAGS) $(LIBTOOL_APP_LDFLAGS)
 
 if TARGET_WINDOWS
-mindblockchain_wallet_SOURCES += mindblockchain-wallet-res.rc
+mindblockchain_wallet_SOURCES += bitcoin-wallet-res.rc
 endif
+
+mindblockchain_wallet_LDADD = \
+  $(LIBBITCOIN_WALLET_TOOL) \
+  $(LIBBITCOIN_WALLET) \
+  $(LIBBITCOIN_SERVER) \
+  $(LIBBITCOIN_COMMON) \
+  $(LIBBITCOIN_CONSENSUS) \
+  $(LIBBITCOIN_UTIL) \
+  $(LIBBITCOIN_CRYPTO) \
+  $(LIBLEVELDB) \
+  $(LIBLEVELDB_SSE42) \
+  $(LIBMEMENV) \
+  $(LIBSECP256K1)
+
+mindblockchain_wallet_LDADD += $(BOOST_LIBS) $(BDB_LIBS) $(CRYPTO_LIBS) $(MINIUPNPC_LIBS)
 #
 
-# mindblockchainconsensus library #
-if BUILD_MINDBLOCKCHAIN_LIBS
-include_HEADERS = script/mindblockchainconsensus.h
-libmindblockchainconsensus_la_SOURCES = support/cleanse.cpp $(crypto_libmindblockchain_crypto_base_a_SOURCES) $(libmindblockchain_consensus_a_SOURCES)
+# bitcoinconsensus library #
+if BUILD_BITCOIN_LIBS
+include_HEADERS = script/bitcoinconsensus.h
+libbitcoinconsensus_la_SOURCES = $(crypto_libbitcoin_crypto_base_a_SOURCES) $(libbitcoin_consensus_a_SOURCES)
 
 if GLIBC_BACK_COMPAT
-  libmindblockchainconsensus_la_SOURCES += compat/glibc_compat.cpp
+  libbitcoinconsensus_la_SOURCES += compat/glibc_compat.cpp
 endif
 
-libmindblockchainconsensus_la_LDFLAGS = $(AM_LDFLAGS) -no-undefined $(RELDFLAGS)
-libmindblockchainconsensus_la_LIBADD = $(LIBSECP256K1)
-libmindblockchainconsensus_la_CPPFLAGS = $(AM_CPPFLAGS) -I$(builddir)/obj -I$(srcdir)/secp256k1/include -DBUILD_MINDBLOCKCHAIN_INTERNAL
-libmindblockchainconsensus_la_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
+libbitcoinconsensus_la_LDFLAGS = $(AM_LDFLAGS) -no-undefined $(RELDFLAGS)
+libbitcoinconsensus_la_LIBADD = $(LIBSECP256K1) $(CRYPTO_LIBS)
+libbitcoinconsensus_la_CPPFLAGS = $(AM_CPPFLAGS) -I$(builddir)/obj -I$(srcdir)/secp256k1/include -DBUILD_BITCOIN_INTERNAL $(SSL_CFLAGS)
+libbitcoinconsensus_la_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
 
 endif
 #
@@ -688,18 +605,12 @@ CLEANFILES = $(EXTRA_LIBRARIES)
 CLEANFILES += *.gcda *.gcno
 CLEANFILES += compat/*.gcda compat/*.gcno
 CLEANFILES += consensus/*.gcda consensus/*.gcno
-CLEANFILES += crc32c/src/*.gcda crc32c/src/*.gcno
 CLEANFILES += crypto/*.gcda crypto/*.gcno
-CLEANFILES += index/*.gcda index/*.gcno
-CLEANFILES += interfaces/*.gcda interfaces/*.gcno
-CLEANFILES += node/*.gcda node/*.gcno
 CLEANFILES += policy/*.gcda policy/*.gcno
 CLEANFILES += primitives/*.gcda primitives/*.gcno
-CLEANFILES += rpc/*.gcda rpc/*.gcno
 CLEANFILES += script/*.gcda script/*.gcno
 CLEANFILES += support/*.gcda support/*.gcno
 CLEANFILES += univalue/*.gcda univalue/*.gcno
-CLEANFILES += util/*.gcda util/*.gcno
 CLEANFILES += wallet/*.gcda wallet/*.gcno
 CLEANFILES += wallet/test/*.gcda wallet/test/*.gcno
 CLEANFILES += zmq/*.gcda zmq/*.gcno
@@ -708,12 +619,12 @@ CLEANFILES += obj/build.h
 EXTRA_DIST = $(CTAES_DIST)
 
 
-config/mindblockchain-config.h: config/stamp-h1
+config/bitcoin-config.h: config/stamp-h1
 	@$(MAKE) -C $(top_builddir) $(subdir)/$(@)
-config/stamp-h1: $(top_srcdir)/$(subdir)/config/mindblockchain-config.h.in $(top_builddir)/config.status
+config/stamp-h1: $(top_srcdir)/$(subdir)/config/bitcoin-config.h.in $(top_builddir)/config.status
 	$(AM_V_at)$(MAKE) -C $(top_builddir) $(subdir)/$(@)
-$(top_srcdir)/$(subdir)/config/mindblockchain-config.h.in:  $(am__configure_deps)
-	$(AM_V_at)$(MAKE) -C $(top_srcdir) $(subdir)/config/mindblockchain-config.h.in
+$(top_srcdir)/$(subdir)/config/bitcoin-config.h.in:  $(am__configure_deps)
+	$(AM_V_at)$(MAKE) -C $(top_srcdir) $(subdir)/config/bitcoin-config.h.in
 
 clean-local:
 	-$(MAKE) -C secp256k1 clean
@@ -728,34 +639,26 @@ clean-local:
 	$(AM_V_GEN) $(WINDRES) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(CPPFLAGS) -DWINDRES_PREPROC -i $< -o $@
 
 check-symbols: $(bin_PROGRAMS)
-if TARGET_DARWIN
-	@echo "Checking macOS dynamic libraries..."
-	$(AM_V_at) OTOOL=$(OTOOL) $(PYTHON) $(top_srcdir)/contrib/devtools/symbol-check.py $(bin_PROGRAMS)
-endif
-
-if TARGET_WINDOWS
-	@echo "Checking Windows dynamic libraries..."
-	$(AM_V_at) OBJDUMP=$(OBJDUMP) $(PYTHON) $(top_srcdir)/contrib/devtools/symbol-check.py $(bin_PROGRAMS)
-endif
-
 if GLIBC_BACK_COMPAT
 	@echo "Checking glibc back compat..."
-	$(AM_V_at) READELF=$(READELF) CPPFILT=$(CPPFILT) $(PYTHON) $(top_srcdir)/contrib/devtools/symbol-check.py $(bin_PROGRAMS)
+	$(AM_V_at) READELF=$(READELF) CPPFILT=$(CPPFILT) $(top_srcdir)/contrib/devtools/symbol-check.py $(bin_PROGRAMS)
 endif
 
 check-security: $(bin_PROGRAMS)
 if HARDEN
 	@echo "Checking binary security..."
-	$(AM_V_at) READELF=$(READELF) OBJDUMP=$(OBJDUMP) OTOOL=$(OTOOL) $(PYTHON) $(top_srcdir)/contrib/devtools/security-check.py $(bin_PROGRAMS)
+	$(AM_V_at) READELF=$(READELF) OBJDUMP=$(OBJDUMP) $(top_srcdir)/contrib/devtools/security-check.py $(bin_PROGRAMS)
+endif
+
+if ENABLE_BIP70
+%.pb.cc %.pb.h: %.proto
+	@test -f $(PROTOC)
+	$(AM_V_GEN) $(PROTOC) --cpp_out=$(@D) --proto_path=$(<D) $<
 endif
 
 if EMBEDDED_LEVELDB
-include Makefile.crc32c.include
 include Makefile.leveldb.include
 endif
-
-include Makefile.test_util.include
-include Makefile.test_fuzz.include
 
 if ENABLE_TESTS
 include Makefile.test.include

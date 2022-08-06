@@ -15,16 +15,19 @@ import os
 from itertools import islice
 from base58 import b58encode_chk, b58decode_chk, b58chars
 import random
-from segwit_addr import bech32_encode, decode_segwit_address, convertbits, CHARSET
+from binascii import b2a_hex
+from segwit_addr import bech32_encode, decode, convertbits, CHARSET
 
 # key types
-PUBKEY_ADDRESS = 0
+PUBKEY_ADDRESS = 6
 SCRIPT_ADDRESS = 5
+SCRIPT_ADDRESS2 = 5
 PUBKEY_ADDRESS_TEST = 111
 SCRIPT_ADDRESS_TEST = 196
+SCRIPT_ADDRESS_TEST2 = 25
 PUBKEY_ADDRESS_REGTEST = 111
 SCRIPT_ADDRESS_REGTEST = 196
-PRIVKEY = 128
+PRIVKEY = 133
 PRIVKEY_TEST = 239
 PRIVKEY_REGTEST = 239
 
@@ -52,8 +55,10 @@ templates = [
   #                                  None = N/A
   ((PUBKEY_ADDRESS,),         20, (),   (False, 'main',    None,  None), pubkey_prefix, pubkey_suffix),
   ((SCRIPT_ADDRESS,),         20, (),   (False, 'main',    None,  None), script_prefix, script_suffix),
+  ((SCRIPT_ADDRESS2,),        20, (),   (False, 'main',    None,  None), script_prefix, script_suffix),
   ((PUBKEY_ADDRESS_TEST,),    20, (),   (False, 'test',    None,  None), pubkey_prefix, pubkey_suffix),
   ((SCRIPT_ADDRESS_TEST,),    20, (),   (False, 'test',    None,  None), script_prefix, script_suffix),
+  ((SCRIPT_ADDRESS_TEST2,),   20, (),   (False, 'test',    None,  None), script_prefix, script_suffix),
   ((PUBKEY_ADDRESS_REGTEST,), 20, (),   (False, 'regtest', None,  None), pubkey_prefix, pubkey_suffix),
   ((SCRIPT_ADDRESS_REGTEST,), 20, (),   (False, 'regtest', None,  None), script_prefix, script_suffix),
   ((PRIVKEY,),                32, (),   (True,  'main',    False, None), (),            ()),
@@ -66,28 +71,28 @@ templates = [
 # templates for valid bech32 sequences
 bech32_templates = [
   # hrp, version, witprog_size, metadata, output_prefix
-  ('bc',    0, 20, (False, 'main',    None, True), p2wpkh_prefix),
-  ('bc',    0, 32, (False, 'main',    None, True), p2wsh_prefix),
-  ('bc',    1,  2, (False, 'main',    None, True), (OP_1, 2)),
-  ('tb',    0, 20, (False, 'test',    None, True), p2wpkh_prefix),
-  ('tb',    0, 32, (False, 'test',    None, True), p2wsh_prefix),
-  ('tb',    2, 16, (False, 'test',    None, True), (OP_2, 16)),
-  ('bcrt',  0, 20, (False, 'regtest', None, True), p2wpkh_prefix),
-  ('bcrt',  0, 32, (False, 'regtest', None, True), p2wsh_prefix),
-  ('bcrt', 16, 40, (False, 'regtest', None, True), (OP_16, 40))
+  ('mind',   0, 20, (False, 'main',    None, True), p2wpkh_prefix),
+  ('mind',   0, 32, (False, 'main',    None, True), p2wsh_prefix),
+  ('mind',   1,  2, (False, 'main',    None, True), (OP_1, 2)),
+  ('tmind',  0, 20, (False, 'test',    None, True), p2wpkh_prefix),
+  ('tmind',  0, 32, (False, 'test',    None, True), p2wsh_prefix),
+  ('tmind',  2, 16, (False, 'test',    None, True), (OP_2, 16)),
+  ('rmind',  0, 20, (False, 'regtest', None, True), p2wpkh_prefix),
+  ('rmind',  0, 32, (False, 'regtest', None, True), p2wsh_prefix),
+  ('rmind', 16, 40, (False, 'regtest', None, True), (OP_16, 40))
 ]
 # templates for invalid bech32 sequences
 bech32_ng_templates = [
   # hrp, version, witprog_size, invalid_bech32, invalid_checksum, invalid_char
   ('tc',    0, 20, False, False, False),
-  ('tb',   17, 32, False, False, False),
-  ('bcrt',  3,  1, False, False, False),
-  ('bc',   15, 41, False, False, False),
-  ('tb',    0, 16, False, False, False),
-  ('bcrt',  0, 32, True,  False, False),
-  ('bc',    0, 16, True,  False, False),
-  ('tb',    0, 32, False, True,  False),
-  ('bcrt',  0, 20, False, False, True)
+  ('tmind',  17, 32, False, False, False),
+  ('rmind',  3,  1, False, False, False),
+  ('mind',   15, 41, False, False, False),
+  ('tmind',  0, 16, False, False, False),
+  ('rmind',  0, 32, True,  False, False),
+  ('mind',   0, 16, True,  False, False),
+  ('tmind',  0, 32, False, True,  False),
+  ('rmind',  0, 20, False, False, True)
 ]
 
 def is_valid(v):
@@ -107,8 +112,8 @@ def is_valid(v):
 
 def is_valid_bech32(v):
     '''Check vector v for bech32 validity'''
-    for hrp in ['bc', 'tb', 'bcrt']:
-        if decode_segwit_address(hrp, v) != (None, None):
+    for hrp in ['mind', 'tmind', 'rmind']:
+        if decode(hrp, v) != (None, None):
             return True
     return False
 
@@ -140,7 +145,9 @@ def gen_valid_vectors():
             rv, payload = valid_vector_generator(template)
             assert is_valid(rv)
             metadata = {x: y for x, y in zip(metadata_keys,template[3]) if y is not None}
-            hexrepr = payload.hex()
+            hexrepr = b2a_hex(payload)
+            if isinstance(hexrepr, bytes):
+                hexrepr = hexrepr.decode('utf8')
             yield (rv, hexrepr, metadata)
 
 def gen_invalid_base58_vector(template):

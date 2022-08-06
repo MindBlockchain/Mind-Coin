@@ -1,9 +1,9 @@
 .PHONY: FORCE
 all: FORCE
-	$(MAKE) -C .. mindblockchain_qt test_mindblockchain_qt
+	$(MAKE) -C .. bitcoin_qt test_bitcoin_qt
 clean: FORCE
-	$(MAKE) -C .. mindblockchain_qt_clean test_mindblockchain_qt_clean
+	$(MAKE) -C .. bitcoin_qt_clean test_bitcoin_qt_clean
 check: FORCE
-	$(MAKE) -C .. test_mindblockchain_qt_check
-mindblockchain-qt mindblockchain-qt.exe: FORCE
-	 $(MAKE) -C .. mindblockchain_qt
+	$(MAKE) -C .. test_bitcoin_qt_check
+bitcoin-qt bitcoin-qt.exe: FORCE
+	 $(MAKE) -C .. bitcoin_qt

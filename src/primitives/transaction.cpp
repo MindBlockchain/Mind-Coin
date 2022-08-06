@@ -1,6 +1,6 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
-// Copyright (c) 2009-2020 The Bitcoin Core developers
-// Copyright (c) 2021 The MindBlockchain Core developers
+// Copyright (c) 2009-2018 The Bitcoin Core developers
+// Copyright (c) 2022 The Mindblockchain Core developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -9,8 +9,6 @@
 #include <hash.h>
 #include <tinyformat.h>
 #include <util/strencodings.h>
-
-#include <assert.h>
 
 std::string COutPoint::ToString() const
 {
@@ -87,11 +85,10 @@ CAmount CTransaction::GetValueOut() const
 {
     CAmount nValueOut = 0;
     for (const auto& tx_out : vout) {
-        if (!MoneyRange(tx_out.nValue) || !MoneyRange(nValueOut + tx_out.nValue))
-            throw std::runtime_error(std::string(__func__) + ": value out of range");
         nValueOut += tx_out.nValue;
+        if (!MoneyRange(tx_out.nValue) || !MoneyRange(nValueOut))
+            throw std::runtime_error(std::string(__func__) + ": value out of range");
     }
-    assert(MoneyRange(nValueOut));
     return nValueOut;
 }
 

@@ -2,8 +2,8 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef MINDBLOCKCHAIN_QT_SIGNVERIFYMESSAGEDIALOG_H
-#define MINDBLOCKCHAIN_QT_SIGNVERIFYMESSAGEDIALOG_H
+#ifndef BITCOIN_QT_SIGNVERIFYMESSAGEDIALOG_H
+#define BITCOIN_QT_SIGNVERIFYMESSAGEDIALOG_H
 
 #include <QDialog>
 
@@ -30,7 +30,7 @@ public:
     void showTab_VM(bool fShow);
 
 protected:
-    bool eventFilter(QObject *object, QEvent *event) override;
+    bool eventFilter(QObject *object, QEvent *event);
 
 private:
     Ui::SignVerifyMessageDialog *ui;
@@ -50,4 +50,4 @@ private Q_SLOTS:
     void on_clearButton_VM_clicked();
 };
 
-#endif // MINDBLOCKCHAIN_QT_SIGNVERIFYMESSAGEDIALOG_H
+#endif // BITCOIN_QT_SIGNVERIFYMESSAGEDIALOG_H

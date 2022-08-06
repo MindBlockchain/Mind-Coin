@@ -30,33 +30,8 @@ Network specific options can be:
 - placed into sections with headers `[main]` (not `[mainnet]`), `[test]` (not `[testnet]`) or `[regtest]`;
 - prefixed with a chain name; e.g., `regtest.maxmempool=100`.
 
-Network specific options take precedence over non-network specific options.
-If multiple values for the same option are found with the same precedence, the
-first one is generally chosen.
-
-This means that given the following configuration, `regtest.rpcport` is set to `3000`:
-
-```
-regtest=1
-rpcport=2000
-regtest.rpcport=3000
-
-[regtest]
-rpcport=4000
-```
-
 ## Configuration File Path
 
-The configuration file is not automatically created; you can create it using your favorite text editor. By default, the configuration file name is `mindblockchain.conf` and it is located in the MindBlockchain data directory, but both the MindBlockchain data directory and the configuration file path may be changed using the `-datadir` and `-conf` command-line options.
+The configuration file is not automatically created; you can create it using your favorite text editor. By default, the configuration file name is `mindblockchain.conf` and it is located in the Mindblockchain data directory, but both the Mindblockchain data directory and the configuration file path may be changed using the `-datadir` and `-conf` command-line options.
 
 The `includeconf=<file>` option in the `mindblockchain.conf` file can be used to include additional configuration files.
-
-### Default configuration file locations
-
-Operating System | Data Directory | Example Path
--- | -- | --
-Windows | `%APPDATA%\MindBlockchain\` | `C:\Users\username\AppData\Roaming\MindBlockchain\mindblockchain.conf`
-Linux | `$HOME/.mindblockchain/` | `/home/username/.mindblockchain/mindblockchain.conf`
-macOS | `$HOME/Library/Application Support/MindBlockchain/` | `/Users/username/Library/Application Support/MindBlockchain/mindblockchain.conf`
-
-You can find an example mindblockchain.conf file in [share/examples/mindblockchain.conf](../share/examples/mindblockchain.conf).

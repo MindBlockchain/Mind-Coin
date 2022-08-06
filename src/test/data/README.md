@@ -1,7 +1,7 @@
 Description
 ------------
 
-This directory contains data-driven tests for various aspects of MindBlockchain.
+This directory contains data-driven tests for various aspects of Mindblockchain.
 
 License
 --------

@@ -1,6 +1,6 @@
 dist_man1_MANS=
 
-if BUILD_MINDBLOCKCHAIND
+if BUILD_BITCOIND
   dist_man1_MANS+=mindblockchaind.1
 endif
 
@@ -8,16 +8,16 @@ if ENABLE_QT
   dist_man1_MANS+=mindblockchain-qt.1
 endif
 
-if BUILD_MINDBLOCKCHAIN_CLI
+if BUILD_BITCOIN_CLI
   dist_man1_MANS+=mindblockchain-cli.1
 endif
 
-if BUILD_MINDBLOCKCHAIN_TX
+if BUILD_BITCOIN_TX
   dist_man1_MANS+=mindblockchain-tx.1
 endif
 
 if ENABLE_WALLET
-if BUILD_MINDBLOCKCHAIN_WALLET
+if BUILD_BITCOIN_WALLET
   dist_man1_MANS+=mindblockchain-wallet.1
 endif
 endif

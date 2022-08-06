@@ -1,6 +1,5 @@
 ---
 name: "mindblockchain-dmg-signer"
-distro: "ubuntu"
 suites:
 - "bionic"
 architectures:
@@ -8,7 +7,7 @@ architectures:
 packages:
 - "faketime"
 remotes:
-- "url": "https://github.com/mindblockchain-core/mindblockchain-detached-sigs.git"
+- "url": "https://github.com/mindblockchain-project/mindblockchain-detached-sigs.git"
   "dir": "signature"
 files:
 - "mindblockchain-osx-unsigned.tar.gz"
@@ -17,14 +16,14 @@ script: |
 
   WRAP_DIR=$HOME/wrapped
   mkdir -p ${WRAP_DIR}
-  export PATH="$PWD":$PATH
+  export PATH=`pwd`:$PATH
   FAKETIME_PROGS="dmg genisoimage"
 
   # Create global faketime wrappers
   for prog in ${FAKETIME_PROGS}; do
     echo '#!/usr/bin/env bash' > ${WRAP_DIR}/${prog}
     echo "REAL=\`which -a ${prog} | grep -v ${WRAP_DIR}/${prog} | head -1\`" >> ${WRAP_DIR}/${prog}
-    echo "export LD_PRELOAD='/usr/\$LIB/faketime/libfaketime.so.1'" >> ${WRAP_DIR}/${prog}
+    echo 'export LD_PRELOAD=/usr/lib/x86_64-linux-gnu/faketime/libfaketime.so.1' >> ${WRAP_DIR}/${prog}
     echo "export FAKETIME=\"${REFERENCE_DATETIME}\"" >> ${WRAP_DIR}/${prog}
     echo "\$REAL \$@" >> $WRAP_DIR/${prog}
     chmod +x ${WRAP_DIR}/${prog}

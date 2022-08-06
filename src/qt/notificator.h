@@ -2,11 +2,11 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef MINDBLOCKCHAIN_QT_NOTIFICATOR_H
-#define MINDBLOCKCHAIN_QT_NOTIFICATOR_H
+#ifndef BITCOIN_QT_NOTIFICATOR_H
+#define BITCOIN_QT_NOTIFICATOR_H
 
 #if defined(HAVE_CONFIG_H)
-#include <config/mindblockchain-config.h>
+#include <config/bitcoin-config.h>
 #endif
 
 #include <QIcon>
@@ -74,4 +74,4 @@ private:
 #endif
 };
 
-#endif // MINDBLOCKCHAIN_QT_NOTIFICATOR_H
+#endif // BITCOIN_QT_NOTIFICATOR_H

@@ -1,6 +1,6 @@
 all:
-	$(MAKE) -C .. mindblockchain_test
+	$(MAKE) -C .. bitcoin_test
 clean:
-	$(MAKE) -C .. mindblockchain_test_clean
+	$(MAKE) -C .. bitcoin_test_clean
 check:
-	$(MAKE) -C .. mindblockchain_test_check
+	$(MAKE) -C .. bitcoin_test_check

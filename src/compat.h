@@ -1,16 +1,20 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
 // Copyright (c) 2009-2018 The Bitcoin Core developers
+// Copyright (c) 2022 The Mindblockchain Core developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef MINDBLOCKCHAIN_COMPAT_H
-#define MINDBLOCKCHAIN_COMPAT_H
+#ifndef BITCOIN_COMPAT_H
+#define BITCOIN_COMPAT_H
 
 #if defined(HAVE_CONFIG_H)
-#include <config/mindblockchain-config.h>
+#include <config/bitcoin-config.h>
 #endif
 
 #ifdef WIN32
+#ifndef WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN 1
+#endif
 #ifndef NOMINMAX
 #define NOMINMAX
 #endif
@@ -87,7 +91,7 @@ typedef char* sockopt_arg_type;
 
 // Note these both should work with the current usage of poll, but best to be safe
 // WIN32 poll is broken https://daniel.haxx.se/blog/2012/10/10/wsapoll-is-broken/
-// __APPLE__ poll is broke https://github.com/mindblockchain/mindblockchain/pull/14336#issuecomment-437384408
+// __APPLE__ poll is broke https://github.com/bitcoin/bitcoin/pull/14336#issuecomment-437384408
 #if defined(__linux__)
 #define USE_POLL
 #endif
@@ -100,4 +104,4 @@ bool static inline IsSelectableSocket(const SOCKET& s) {
 #endif
 }
 
-#endif // MINDBLOCKCHAIN_COMPAT_H
+#endif // BITCOIN_COMPAT_H

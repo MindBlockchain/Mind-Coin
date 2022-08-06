@@ -1,11 +1,11 @@
 Sample configuration files for:
 ```
-SystemD: mindblockchaind.service
-Upstart: mindblockchaind.conf
-OpenRC:  mindblockchaind.openrc
-         mindblockchaind.openrcconf
-CentOS:  mindblockchaind.init
-macOS:   org.mindblockchain.mindblockchaind.plist
+SystemD: bitcoind.service
+Upstart: bitcoind.conf
+OpenRC:  bitcoind.openrc
+         bitcoind.openrcconf
+CentOS:  bitcoind.init
+macOS:   org.bitcoin.bitcoind.plist
 ```
 have been made available to assist packagers in creating node packages here.
 

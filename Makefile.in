@@ -14,7 +14,7 @@
 
 @SET_MAKE@
 
-# Copyright (c) 2013-2020 The Bitcoin Core developers
+# Copyright (c) 2013-2016 The Bitcoin Core developers
 # Distributed under the MIT software license, see the accompanying
 # file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -97,8 +97,8 @@ host_triplet = @host@
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/build-aux/m4/ax_boost_base.m4 \
+	$(top_srcdir)/build-aux/m4/ax_boost_chrono.m4 \
 	$(top_srcdir)/build-aux/m4/ax_boost_filesystem.m4 \
-	$(top_srcdir)/build-aux/m4/ax_boost_process.m4 \
 	$(top_srcdir)/build-aux/m4/ax_boost_system.m4 \
 	$(top_srcdir)/build-aux/m4/ax_boost_thread.m4 \
 	$(top_srcdir)/build-aux/m4/ax_boost_unit_test_framework.m4 \
@@ -108,15 +108,15 @@ am__aclocal_m4_deps = $(top_srcdir)/build-aux/m4/ax_boost_base.m4 \
 	$(top_srcdir)/build-aux/m4/ax_cxx_compile_stdcxx.m4 \
 	$(top_srcdir)/build-aux/m4/ax_gcc_func_attribute.m4 \
 	$(top_srcdir)/build-aux/m4/ax_pthread.m4 \
+	$(top_srcdir)/build-aux/m4/bitcoin_find_bdb48.m4 \
+	$(top_srcdir)/build-aux/m4/bitcoin_qt.m4 \
+	$(top_srcdir)/build-aux/m4/bitcoin_subdir_to_include.m4 \
 	$(top_srcdir)/build-aux/m4/l_atomic.m4 \
 	$(top_srcdir)/build-aux/m4/libtool.m4 \
 	$(top_srcdir)/build-aux/m4/ltoptions.m4 \
 	$(top_srcdir)/build-aux/m4/ltsugar.m4 \
 	$(top_srcdir)/build-aux/m4/ltversion.m4 \
 	$(top_srcdir)/build-aux/m4/lt~obsolete.m4 \
-	$(top_srcdir)/build-aux/m4/mindblockchain_find_bdb48.m4 \
-	$(top_srcdir)/build-aux/m4/mindblockchain_qt.m4 \
-	$(top_srcdir)/build-aux/m4/mindblockchain_subdir_to_include.m4 \
 	$(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
@@ -126,14 +126,12 @@ DIST_COMMON = $(srcdir)/Makefile.am $(top_srcdir)/configure \
 am__CONFIG_DISTCLEAN_FILES = config.status config.cache config.log \
  configure.lineno config.status.lineno
 mkinstalldirs = $(install_sh) -d
-CONFIG_HEADER = $(top_builddir)/src/config/mindblockchain-config.h
-CONFIG_CLEAN_FILES = libmindblockchainconsensus.pc share/setup.nsi \
+CONFIG_HEADER = $(top_builddir)/src/config/bitcoin-config.h
+CONFIG_CLEAN_FILES = libbitcoinconsensus.pc share/setup.nsi \
 	share/qt/Info.plist test/config.ini \
 	contrib/devtools/split-debug.sh doc/Doxyfile
-CONFIG_CLEAN_VPATH_FILES = contrib/devtools/security-check.py \
-	contrib/devtools/test-security-check.py contrib/filter-lcov.py \
-	test/functional/test_runner.py test/fuzz/test_runner.py \
-	test/util/mindblockchain-util-test.py \
+CONFIG_CLEAN_VPATH_FILES = contrib/filter-lcov.py \
+	test/functional/test_runner.py test/util/bitcoin-util-test.py \
 	test/util/rpcauth-test.py
 SCRIPTS = $(dist_noinst_SCRIPTS)
 AM_V_P = $(am__v_P_@AM_V@)
@@ -222,25 +220,22 @@ CTAGS = ctags
 CSCOPE = cscope
 DIST_SUBDIRS = src doc/man
 am__DIST_COMMON = $(srcdir)/Makefile.in \
-	$(srcdir)/libmindblockchainconsensus.pc.in \
+	$(srcdir)/libbitcoinconsensus.pc.in \
 	$(top_srcdir)/build-aux/compile \
 	$(top_srcdir)/build-aux/config.guess \
 	$(top_srcdir)/build-aux/config.sub \
 	$(top_srcdir)/build-aux/install-sh \
 	$(top_srcdir)/build-aux/ltmain.sh \
 	$(top_srcdir)/build-aux/missing \
-	$(top_srcdir)/contrib/devtools/security-check.py \
 	$(top_srcdir)/contrib/devtools/split-debug.sh.in \
-	$(top_srcdir)/contrib/devtools/test-security-check.py \
 	$(top_srcdir)/contrib/filter-lcov.py \
 	$(top_srcdir)/doc/Doxyfile.in \
 	$(top_srcdir)/share/qt/Info.plist.in \
 	$(top_srcdir)/share/setup.nsi.in \
-	$(top_srcdir)/src/config/mindblockchain-config.h.in \
+	$(top_srcdir)/src/config/bitcoin-config.h.in \
 	$(top_srcdir)/test/config.ini.in \
 	$(top_srcdir)/test/functional/test_runner.py \
-	$(top_srcdir)/test/fuzz/test_runner.py \
-	$(top_srcdir)/test/util/mindblockchain-util-test.py \
+	$(top_srcdir)/test/util/bitcoin-util-test.py \
 	$(top_srcdir)/test/util/rpcauth-test.py COPYING \
 	build-aux/compile build-aux/config.guess build-aux/config.sub \
 	build-aux/install-sh build-aux/ltmain.sh build-aux/missing
@@ -291,7 +286,6 @@ AMTAR = @AMTAR@
 AM_DEFAULT_VERBOSITY = @AM_DEFAULT_VERBOSITY@
 AR = @AR@
 ARFLAGS = @ARFLAGS@
-ARM_CRC_CXXFLAGS = @ARM_CRC_CXXFLAGS@
 AUTOCONF = @AUTOCONF@
 AUTOHEADER = @AUTOHEADER@
 AUTOMAKE = @AUTOMAKE@
@@ -300,11 +294,16 @@ AWK = @AWK@
 BDB_CFLAGS = @BDB_CFLAGS@
 BDB_CPPFLAGS = @BDB_CPPFLAGS@
 BDB_LIBS = @BDB_LIBS@
+BITCOIN_CLI_NAME = @BITCOIN_CLI_NAME@
+BITCOIN_DAEMON_NAME = @BITCOIN_DAEMON_NAME@
+BITCOIN_GUI_NAME = @BITCOIN_GUI_NAME@
+BITCOIN_TX_NAME = @BITCOIN_TX_NAME@
+BITCOIN_WALLET_TOOL_NAME = @BITCOIN_WALLET_TOOL_NAME@
+BOOST_CHRONO_LIB = @BOOST_CHRONO_LIB@
 BOOST_CPPFLAGS = @BOOST_CPPFLAGS@
 BOOST_FILESYSTEM_LIB = @BOOST_FILESYSTEM_LIB@
 BOOST_LDFLAGS = @BOOST_LDFLAGS@
 BOOST_LIBS = @BOOST_LIBS@
-BOOST_PROCESS_LIB = @BOOST_PROCESS_LIB@
 BOOST_SYSTEM_LIB = @BOOST_SYSTEM_LIB@
 BOOST_THREAD_LIB = @BOOST_THREAD_LIB@
 BOOST_UNIT_TEST_FRAMEWORK_LIB = @BOOST_UNIT_TEST_FRAMEWORK_LIB@
@@ -323,11 +322,11 @@ COPYRIGHT_HOLDERS = @COPYRIGHT_HOLDERS@
 COPYRIGHT_HOLDERS_FINAL = @COPYRIGHT_HOLDERS_FINAL@
 COPYRIGHT_HOLDERS_SUBSTITUTION = @COPYRIGHT_HOLDERS_SUBSTITUTION@
 COPYRIGHT_YEAR = @COPYRIGHT_YEAR@
-COV_TOOL = @COV_TOOL@
-COV_TOOL_WRAPPER = @COV_TOOL_WRAPPER@
 CPP = @CPP@
 CPPFILT = @CPPFILT@
 CPPFLAGS = @CPPFLAGS@
+CRYPTO_CFLAGS = @CRYPTO_CFLAGS@
+CRYPTO_LIBS = @CRYPTO_LIBS@
 CXX = @CXX@
 CXXCPP = @CXXCPP@
 CXXDEPMODE = @CXXDEPMODE@
@@ -363,16 +362,7 @@ GREP = @GREP@
 HARDENED_CPPFLAGS = @HARDENED_CPPFLAGS@
 HARDENED_CXXFLAGS = @HARDENED_CXXFLAGS@
 HARDENED_LDFLAGS = @HARDENED_LDFLAGS@
-HAVE_BUILTIN_PREFETCH = @HAVE_BUILTIN_PREFETCH@
 HAVE_CXX11 = @HAVE_CXX11@
-HAVE_CXX17 = @HAVE_CXX17@
-HAVE_FDATASYNC = @HAVE_FDATASYNC@
-HAVE_FULLFSYNC = @HAVE_FULLFSYNC@
-HAVE_GMTIME_R = @HAVE_GMTIME_R@
-HAVE_MM_PREFETCH = @HAVE_MM_PREFETCH@
-HAVE_O_CLOEXEC = @HAVE_O_CLOEXEC@
-HAVE_STRONG_GETAUXVAL = @HAVE_STRONG_GETAUXVAL@
-HAVE_WEAK_GETAUXVAL = @HAVE_WEAK_GETAUXVAL@
 HEXDUMP = @HEXDUMP@
 IMAGEMAGICK_CONVERT = @IMAGEMAGICK_CONVERT@
 INSTALL = @INSTALL@
@@ -386,16 +376,14 @@ LCOV_OPTS = @LCOV_OPTS@
 LD = @LD@
 LDFLAGS = @LDFLAGS@
 LEVELDB_CPPFLAGS = @LEVELDB_CPPFLAGS@
+LEVELDB_TARGET_FLAGS = @LEVELDB_TARGET_FLAGS@
 LIBLEVELDB = @LIBLEVELDB@
 LIBMEMENV = @LIBMEMENV@
-LIBMULTIPROCESS_CFLAGS = @LIBMULTIPROCESS_CFLAGS@
-LIBMULTIPROCESS_LIBS = @LIBMULTIPROCESS_LIBS@
 LIBOBJS = @LIBOBJS@
 LIBS = @LIBS@
 LIBTOOL = @LIBTOOL@
 LIBTOOL_APP_LDFLAGS = @LIBTOOL_APP_LDFLAGS@
 LIPO = @LIPO@
-LLVM_COV = @LLVM_COV@
 LN_S = @LN_S@
 LRELEASE = @LRELEASE@
 LTLIBOBJS = @LTLIBOBJS@
@@ -405,17 +393,11 @@ MAINT = @MAINT@
 MAKEINFO = @MAKEINFO@
 MAKENSIS = @MAKENSIS@
 MANIFEST_TOOL = @MANIFEST_TOOL@
-MINDBLOCKCHAIN_CLI_NAME = @MINDBLOCKCHAIN_CLI_NAME@
-MINDBLOCKCHAIN_DAEMON_NAME = @MINDBLOCKCHAIN_DAEMON_NAME@
-MINDBLOCKCHAIN_GUI_NAME = @MINDBLOCKCHAIN_GUI_NAME@
-MINDBLOCKCHAIN_TX_NAME = @MINDBLOCKCHAIN_TX_NAME@
-MINDBLOCKCHAIN_WALLET_TOOL_NAME = @MINDBLOCKCHAIN_WALLET_TOOL_NAME@
 MINIUPNPC_CPPFLAGS = @MINIUPNPC_CPPFLAGS@
 MINIUPNPC_LIBS = @MINIUPNPC_LIBS@
 MKDIR_P = @MKDIR_P@
 MOC = @MOC@
 MOC_DEFS = @MOC_DEFS@
-MPGEN_PREFIX = @MPGEN_PREFIX@
 NM = @NM@
 NMEDIT = @NMEDIT@
 NOWARN_CXXFLAGS = @NOWARN_CXXFLAGS@
@@ -440,6 +422,9 @@ PIE_FLAGS = @PIE_FLAGS@
 PKG_CONFIG = @PKG_CONFIG@
 PKG_CONFIG_LIBDIR = @PKG_CONFIG_LIBDIR@
 PKG_CONFIG_PATH = @PKG_CONFIG_PATH@
+PROTOBUF_CFLAGS = @PROTOBUF_CFLAGS@
+PROTOBUF_LIBS = @PROTOBUF_LIBS@
+PROTOC = @PROTOC@
 PTHREAD_CC = @PTHREAD_CC@
 PTHREAD_CFLAGS = @PTHREAD_CFLAGS@
 PTHREAD_LIBS = @PTHREAD_LIBS@
@@ -447,6 +432,8 @@ PYTHON = @PYTHON@
 PYTHONPATH = @PYTHONPATH@
 QR_CFLAGS = @QR_CFLAGS@
 QR_LIBS = @QR_LIBS@
+QT5_CFLAGS = @QT5_CFLAGS@
+QT5_LIBS = @QT5_LIBS@
 QTACCESSIBILITY_CFLAGS = @QTACCESSIBILITY_CFLAGS@
 QTACCESSIBILITY_LIBS = @QTACCESSIBILITY_LIBS@
 QTCGL_CFLAGS = @QTCGL_CFLAGS@
@@ -463,31 +450,26 @@ QTFONTDATABASE_CFLAGS = @QTFONTDATABASE_CFLAGS@
 QTFONTDATABASE_LIBS = @QTFONTDATABASE_LIBS@
 QTGRAPHICS_CFLAGS = @QTGRAPHICS_CFLAGS@
 QTGRAPHICS_LIBS = @QTGRAPHICS_LIBS@
+QTPLATFORM_CFLAGS = @QTPLATFORM_CFLAGS@
+QTPLATFORM_LIBS = @QTPLATFORM_LIBS@
 QTTHEME_CFLAGS = @QTTHEME_CFLAGS@
 QTTHEME_LIBS = @QTTHEME_LIBS@
 QTXCBQPA_CFLAGS = @QTXCBQPA_CFLAGS@
 QTXCBQPA_LIBS = @QTXCBQPA_LIBS@
-QT_CORE_CFLAGS = @QT_CORE_CFLAGS@
-QT_CORE_LIBS = @QT_CORE_LIBS@
 QT_DBUS_CFLAGS = @QT_DBUS_CFLAGS@
 QT_DBUS_INCLUDES = @QT_DBUS_INCLUDES@
 QT_DBUS_LIBS = @QT_DBUS_LIBS@
-QT_GUI_CFLAGS = @QT_GUI_CFLAGS@
-QT_GUI_LIBS = @QT_GUI_LIBS@
 QT_INCLUDES = @QT_INCLUDES@
 QT_LDFLAGS = @QT_LDFLAGS@
 QT_LIBS = @QT_LIBS@
-QT_NETWORK_CFLAGS = @QT_NETWORK_CFLAGS@
-QT_NETWORK_LIBS = @QT_NETWORK_LIBS@
 QT_PIE_FLAGS = @QT_PIE_FLAGS@
 QT_SELECT = @QT_SELECT@
 QT_TEST_CFLAGS = @QT_TEST_CFLAGS@
 QT_TEST_INCLUDES = @QT_TEST_INCLUDES@
 QT_TEST_LIBS = @QT_TEST_LIBS@
 QT_TRANSLATION_DIR = @QT_TRANSLATION_DIR@
-QT_WIDGETS_CFLAGS = @QT_WIDGETS_CFLAGS@
-QT_WIDGETS_LIBS = @QT_WIDGETS_LIBS@
 RANLIB = @RANLIB@
+RAPIDCHECK_LIBS = @RAPIDCHECK_LIBS@
 RCC = @RCC@
 READELF = @READELF@
 RELDFLAGS = @RELDFLAGS@
@@ -498,10 +480,10 @@ SED = @SED@
 SET_MAKE = @SET_MAKE@
 SHANI_CXXFLAGS = @SHANI_CXXFLAGS@
 SHELL = @SHELL@
-SQLITE_CFLAGS = @SQLITE_CFLAGS@
-SQLITE_LIBS = @SQLITE_LIBS@
 SSE41_CXXFLAGS = @SSE41_CXXFLAGS@
 SSE42_CXXFLAGS = @SSE42_CXXFLAGS@
+SSL_CFLAGS = @SSL_CFLAGS@
+SSL_LIBS = @SSL_LIBS@
 STRIP = @STRIP@
 TESTDEFS = @TESTDEFS@
 TIFFCP = @TIFFCP@
@@ -509,11 +491,14 @@ UIC = @UIC@
 UNIVALUE_CFLAGS = @UNIVALUE_CFLAGS@
 UNIVALUE_LIBS = @UNIVALUE_LIBS@
 USE_QRCODE = @USE_QRCODE@
-USE_SQLITE = @USE_SQLITE@
+USE_SSE2 = @USE_SSE2@
 USE_UPNP = @USE_UPNP@
 VERSION = @VERSION@
 WARN_CXXFLAGS = @WARN_CXXFLAGS@
+WINDOWS_BITS = @WINDOWS_BITS@
 WINDRES = @WINDRES@
+X11XCB_CFLAGS = @X11XCB_CFLAGS@
+X11XCB_LIBS = @X11XCB_LIBS@
 XGETTEXT = @XGETTEXT@
 ZMQ_CFLAGS = @ZMQ_CFLAGS@
 ZMQ_LIBS = @ZMQ_LIBS@
@@ -576,17 +561,17 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 ACLOCAL_AMFLAGS = -I build-aux/m4
 SUBDIRS = src $(am__append_1)
-@BUILD_MINDBLOCKCHAIN_LIBS_TRUE@pkgconfigdir = $(libdir)/pkgconfig
-@BUILD_MINDBLOCKCHAIN_LIBS_TRUE@pkgconfig_DATA = libmindblockchainconsensus.pc
-MINDBLOCKCHAIND_BIN = $(top_builddir)/src/$(MINDBLOCKCHAIN_DAEMON_NAME)$(EXEEXT)
-MINDBLOCKCHAIN_QT_BIN = $(top_builddir)/src/qt/$(MINDBLOCKCHAIN_GUI_NAME)$(EXEEXT)
-MINDBLOCKCHAIN_CLI_BIN = $(top_builddir)/src/$(MINDBLOCKCHAIN_CLI_NAME)$(EXEEXT)
-MINDBLOCKCHAIN_TX_BIN = $(top_builddir)/src/$(MINDBLOCKCHAIN_TX_NAME)$(EXEEXT)
-MINDBLOCKCHAIN_WALLET_BIN = $(top_builddir)/src/$(MINDBLOCKCHAIN_WALLET_TOOL_NAME)$(EXEEXT)
-MINDBLOCKCHAIN_WIN_INSTALLER = $(PACKAGE)-$(PACKAGE_VERSION)-win64-setup$(EXEEXT)
+@BUILD_BITCOIN_LIBS_TRUE@pkgconfigdir = $(libdir)/pkgconfig
+@BUILD_BITCOIN_LIBS_TRUE@pkgconfig_DATA = libbitcoinconsensus.pc
+BITCOIND_BIN = $(top_builddir)/src/$(BITCOIN_DAEMON_NAME)$(EXEEXT)
+BITCOIN_QT_BIN = $(top_builddir)/src/qt/$(BITCOIN_GUI_NAME)$(EXEEXT)
+BITCOIN_CLI_BIN = $(top_builddir)/src/$(BITCOIN_CLI_NAME)$(EXEEXT)
+BITCOIN_TX_BIN = $(top_builddir)/src/$(BITCOIN_TX_NAME)$(EXEEXT)
+BITCOIN_WALLET_BIN = $(top_builddir)/src/$(BITCOIN_WALLET_TOOL_NAME)$(EXEEXT)
+BITCOIN_WIN_INSTALLER = $(PACKAGE)-$(PACKAGE_VERSION)-win$(WINDOWS_BITS)-setup$(EXEEXT)
 empty := 
 space := $(empty) $(empty)
-OSX_APP = MindBlockchain-Qt.app
+OSX_APP = Mindblockchain-Qt.app
 OSX_VOLNAME = $(subst $(space),-,$(PACKAGE_NAME))
 OSX_DMG = $(OSX_VOLNAME).dmg
 OSX_BACKGROUND_SVG = background.svg
@@ -595,12 +580,15 @@ OSX_BACKGROUND_IMAGE_DPIS = 36 72
 OSX_DSSTORE_GEN = $(top_srcdir)/contrib/macdeploy/custom_dsstore.py
 OSX_DEPLOY_SCRIPT = $(top_srcdir)/contrib/macdeploy/macdeployqtplus
 OSX_FANCY_PLIST = $(top_srcdir)/contrib/macdeploy/fancy.plist
-OSX_INSTALLER_ICONS = $(top_srcdir)/src/qt/res/icons/mindblockchain.icns
+OSX_INSTALLER_ICONS = $(top_srcdir)/src/qt/res/icons/bitcoin.icns
 OSX_PLIST = $(top_builddir)/share/qt/Info.plist #not installed
-OSX_QT_TRANSLATIONS = ar,bg,ca,cs,da,de,es,fa,fi,fr,gd,gl,he,hu,it,ja,ko,lt,lv,pl,pt,ru,sk,sl,sv,uk,zh_CN,zh_TW
-DIST_CONTRIB = \
-	       $(top_srcdir)/contrib/linearize/linearize-data.py \
-	       $(top_srcdir)/contrib/linearize/linearize-hashes.py
+OSX_QT_TRANSLATIONS = da,de,es,hu,ru,uk,zh_CN,zh_TW
+DIST_DOCS = $(wildcard doc/*.md) $(wildcard doc/release-notes/*.md)
+DIST_CONTRIB = $(top_srcdir)/contrib/bitcoin-cli.bash-completion \
+	       $(top_srcdir)/contrib/bitcoin-tx.bash-completion \
+	       $(top_srcdir)/contrib/bitcoind.bash-completion \
+	       $(top_srcdir)/contrib/init \
+	       $(top_srcdir)/contrib/install_db4.sh
 
 DIST_SHARE = \
   $(top_srcdir)/share/genbuild.sh \
@@ -609,7 +597,7 @@ DIST_SHARE = \
 BIN_CHECKS = $(top_srcdir)/contrib/devtools/symbol-check.py \
            $(top_srcdir)/contrib/devtools/security-check.py
 
-WINDOWS_PACKAGING = $(top_srcdir)/share/pixmaps/mindblockchain.ico \
+WINDOWS_PACKAGING = $(top_srcdir)/share/pixmaps/bitcoin.ico \
   $(top_srcdir)/share/pixmaps/nsis-header.bmp \
   $(top_srcdir)/share/pixmaps/nsis-wizard.bmp \
   $(top_srcdir)/doc/README_windows.txt
@@ -620,36 +608,24 @@ OSX_PACKAGING = $(OSX_DEPLOY_SCRIPT) $(OSX_FANCY_PLIST) $(OSX_INSTALLER_ICONS) \
   $(top_srcdir)/contrib/macdeploy/detached-sig-apply.sh \
   $(top_srcdir)/contrib/macdeploy/detached-sig-create.sh
 
-COVERAGE_INFO = $(COV_TOOL_WRAPPER) baseline.info \
-  test_mindblockchain_filtered.info total_coverage.info \
+COVERAGE_INFO = baseline.info \
+  test_bitcoin_filtered.info total_coverage.info \
   baseline_filtered.info functional_test.info functional_test_filtered.info \
-  test_mindblockchain_coverage.info test_mindblockchain.info fuzz.info fuzz_filtered.info fuzz_coverage.info
+  test_bitcoin_coverage.info test_bitcoin.info
 
 OSX_APP_BUILT = $(OSX_APP)/Contents/PkgInfo $(OSX_APP)/Contents/Resources/empty.lproj \
-  $(OSX_APP)/Contents/Resources/mindblockchain.icns $(OSX_APP)/Contents/Info.plist \
-  $(OSX_APP)/Contents/MacOS/MindBlockchain-Qt $(OSX_APP)/Contents/Resources/Base.lproj/InfoPlist.strings
+  $(OSX_APP)/Contents/Resources/bitcoin.icns $(OSX_APP)/Contents/Info.plist \
+  $(OSX_APP)/Contents/MacOS/Mindblockchain-Qt $(OSX_APP)/Contents/Resources/Base.lproj/InfoPlist.strings
 
 @BUILD_DARWIN_FALSE@APP_DIST_DIR = $(top_builddir)/dist
 @BUILD_DARWIN_FALSE@APP_DIST_EXTRAS = $(APP_DIST_DIR)/.background/$(OSX_BACKGROUND_IMAGE) $(APP_DIST_DIR)/.DS_Store $(APP_DIST_DIR)/Applications
 @BUILD_DARWIN_FALSE@OSX_BACKGROUND_IMAGE_DPIFILES := $(foreach dpi,$(OSX_BACKGROUND_IMAGE_DPIS),dpi$(dpi).$(OSX_BACKGROUND_IMAGE))
-@USE_LCOV_TRUE@LCOV_FILTER_PATTERN = \
-@USE_LCOV_TRUE@	-p "/usr/local/" \
-@USE_LCOV_TRUE@	-p "/usr/include/" \
-@USE_LCOV_TRUE@	-p "/usr/lib/" \
-@USE_LCOV_TRUE@	-p "/usr/lib64/" \
-@USE_LCOV_TRUE@	-p "src/leveldb/" \
-@USE_LCOV_TRUE@	-p "src/crc32c/" \
-@USE_LCOV_TRUE@	-p "src/bench/" \
-@USE_LCOV_TRUE@	-p "src/univalue" \
-@USE_LCOV_TRUE@	-p "src/crypto/ctaes" \
-@USE_LCOV_TRUE@	-p "src/secp256k1" \
-@USE_LCOV_TRUE@	-p "depends"
-
+@USE_LCOV_TRUE@LCOV_FILTER_PATTERN = -p "/usr/include/" -p "/usr/lib/" -p "src/leveldb/" -p "src/bench/" -p "src/univalue" -p "src/crypto/ctaes" -p "src/secp256k1"
 dist_noinst_SCRIPTS = autogen.sh
-EXTRA_DIST = $(DIST_SHARE) $(DIST_CONTRIB) $(WINDOWS_PACKAGING) \
-	$(OSX_PACKAGING) $(BIN_CHECKS) test/functional test/fuzz \
-	test/util/mindblockchain-util-test.py \
-	test/util/data/mindblockchain-util-test.json \
+EXTRA_DIST = $(DIST_SHARE) $(DIST_CONTRIB) $(DIST_DOCS) \
+	$(WINDOWS_PACKAGING) $(OSX_PACKAGING) $(BIN_CHECKS) \
+	test/functional test/fuzz test/util/bitcoin-util-test.py \
+	test/util/data/bitcoin-util-test.json \
 	test/util/data/blanktxv1.hex test/util/data/blanktxv1.json \
 	test/util/data/blanktxv2.hex test/util/data/blanktxv2.json \
 	test/util/data/tt-delin1-out.hex \
@@ -691,12 +667,10 @@ EXTRA_DIST = $(DIST_SHARE) $(DIST_CONTRIB) $(WINDOWS_PACKAGING) \
 	test/util/data/txcreatescript3.json \
 	test/util/data/txcreatescript4.hex \
 	test/util/data/txcreatescript4.json \
-	test/util/data/txcreatescript5.hex \
-	test/util/data/txcreatescript6.hex \
 	test/util/data/txcreatesignv1.hex \
 	test/util/data/txcreatesignv1.json \
 	test/util/data/txcreatesignv2.hex test/util/rpcauth-test.py
-CLEANFILES = $(OSX_DMG) $(MINDBLOCKCHAIN_WIN_INSTALLER)
+CLEANFILES = $(OSX_DMG) $(BITCOIN_WIN_INSTALLER)
 DISTCHECK_CONFIGURE_FLAGS = --enable-man
 all: all-recursive
 
@@ -735,21 +709,21 @@ $(ACLOCAL_M4): @MAINTAINER_MODE_TRUE@ $(am__aclocal_m4_deps)
 	$(am__cd) $(srcdir) && $(ACLOCAL) $(ACLOCAL_AMFLAGS)
 $(am__aclocal_m4_deps):
 
-src/config/mindblockchain-config.h: src/config/stamp-h1
+src/config/bitcoin-config.h: src/config/stamp-h1
 	@test -f $@ || rm -f src/config/stamp-h1
 	@test -f $@ || $(MAKE) $(AM_MAKEFLAGS) src/config/stamp-h1
 
-src/config/stamp-h1: $(top_srcdir)/src/config/mindblockchain-config.h.in $(top_builddir)/config.status
+src/config/stamp-h1: $(top_srcdir)/src/config/bitcoin-config.h.in $(top_builddir)/config.status
 	@rm -f src/config/stamp-h1
-	cd $(top_builddir) && $(SHELL) ./config.status src/config/mindblockchain-config.h
-$(top_srcdir)/src/config/mindblockchain-config.h.in: @MAINTAINER_MODE_TRUE@ $(am__configure_deps) 
+	cd $(top_builddir) && $(SHELL) ./config.status src/config/bitcoin-config.h
+$(top_srcdir)/src/config/bitcoin-config.h.in: @MAINTAINER_MODE_TRUE@ $(am__configure_deps) 
 	($(am__cd) $(top_srcdir) && $(AUTOHEADER))
 	rm -f src/config/stamp-h1
 	touch $@
 
 distclean-hdr:
-	-rm -f src/config/mindblockchain-config.h src/config/stamp-h1
-libmindblockchainconsensus.pc: $(top_builddir)/config.status $(srcdir)/libmindblockchainconsensus.pc.in
+	-rm -f src/config/bitcoin-config.h src/config/stamp-h1
+libbitcoinconsensus.pc: $(top_builddir)/config.status $(srcdir)/libbitcoinconsensus.pc.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 share/setup.nsi: $(top_builddir)/config.status $(top_srcdir)/share/setup.nsi.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
@@ -1220,10 +1194,6 @@ uninstall-am: uninstall-pkgconfigDATA
 
 .PRECIOUS: Makefile
 
-
-# Pattern rule to print variables, e.g. make print-top_srcdir
-print-%:
-	@echo $* = $($*)
 .PHONY: deploy FORCE
 
 export PYTHONPATH
@@ -1231,14 +1201,14 @@ export PYTHONPATH
 dist-hook:
 	-$(GIT) archive --format=tar HEAD -- src/clientversion.cpp | $(AMTAR) -C $(top_distdir) -xf -
 
-$(MINDBLOCKCHAIN_WIN_INSTALLER): all-recursive
+$(BITCOIN_WIN_INSTALLER): all-recursive
 	$(MKDIR_P) $(top_builddir)/release
-	STRIPPROG="$(STRIP)" $(INSTALL_STRIP_PROGRAM) $(MINDBLOCKCHAIND_BIN) $(top_builddir)/release
-	STRIPPROG="$(STRIP)" $(INSTALL_STRIP_PROGRAM) $(MINDBLOCKCHAIN_QT_BIN) $(top_builddir)/release
-	STRIPPROG="$(STRIP)" $(INSTALL_STRIP_PROGRAM) $(MINDBLOCKCHAIN_CLI_BIN) $(top_builddir)/release
-	STRIPPROG="$(STRIP)" $(INSTALL_STRIP_PROGRAM) $(MINDBLOCKCHAIN_TX_BIN) $(top_builddir)/release
-	STRIPPROG="$(STRIP)" $(INSTALL_STRIP_PROGRAM) $(MINDBLOCKCHAIN_WALLET_BIN) $(top_builddir)/release
-	@test -f $(MAKENSIS) && echo 'OutFile "$@"' | cat $(top_builddir)/share/setup.nsi - | $(MAKENSIS) -V2 - || \
+	STRIPPROG="$(STRIP)" $(INSTALL_STRIP_PROGRAM) $(BITCOIND_BIN) $(top_builddir)/release
+	STRIPPROG="$(STRIP)" $(INSTALL_STRIP_PROGRAM) $(BITCOIN_QT_BIN) $(top_builddir)/release
+	STRIPPROG="$(STRIP)" $(INSTALL_STRIP_PROGRAM) $(BITCOIN_CLI_BIN) $(top_builddir)/release
+	STRIPPROG="$(STRIP)" $(INSTALL_STRIP_PROGRAM) $(BITCOIN_TX_BIN) $(top_builddir)/release
+	STRIPPROG="$(STRIP)" $(INSTALL_STRIP_PROGRAM) $(BITCOIN_WALLET_BIN) $(top_builddir)/release
+	@test -f $(MAKENSIS) && $(MAKENSIS) -V2 $(top_builddir)/share/setup.nsi || \
 	  echo error: could not build $@
 	@echo built $@
 
@@ -1248,19 +1218,19 @@ $(OSX_APP)/Contents/PkgInfo:
 
 $(OSX_APP)/Contents/Resources/empty.lproj:
 	$(MKDIR_P) $(@D)
-	@touch $@
+	@touch $@ 
 
 $(OSX_APP)/Contents/Info.plist: $(OSX_PLIST)
 	$(MKDIR_P) $(@D)
 	$(INSTALL_DATA) $< $@
 
-$(OSX_APP)/Contents/Resources/mindblockchain.icns: $(OSX_INSTALLER_ICONS)
+$(OSX_APP)/Contents/Resources/bitcoin.icns: $(OSX_INSTALLER_ICONS)
 	$(MKDIR_P) $(@D)
 	$(INSTALL_DATA) $< $@
 
-$(OSX_APP)/Contents/MacOS/MindBlockchain-Qt: all-recursive
+$(OSX_APP)/Contents/MacOS/Mindblockchain-Qt: all-recursive
 	$(MKDIR_P) $(@D)
-	STRIPPROG="$(STRIP)" $(INSTALL_STRIP_PROGRAM)  $(MINDBLOCKCHAIN_QT_BIN) $@
+	STRIPPROG="$(STRIP)" $(INSTALL_STRIP_PROGRAM)  $(BITCOIN_QT_BIN) $@
 
 $(OSX_APP)/Contents/Resources/Base.lproj/InfoPlist.strings:
 	$(MKDIR_P) $(@D)
@@ -1285,7 +1255,7 @@ osx_volname:
 @BUILD_DARWIN_FALSE@	@rm -f $@
 @BUILD_DARWIN_FALSE@	@cd $(@D); $(LN_S) /Applications $(@F)
 
-@BUILD_DARWIN_FALSE@$(APP_DIST_EXTRAS): $(APP_DIST_DIR)/$(OSX_APP)/Contents/MacOS/MindBlockchain-Qt
+@BUILD_DARWIN_FALSE@$(APP_DIST_EXTRAS): $(APP_DIST_DIR)/$(OSX_APP)/Contents/MacOS/Mindblockchain-Qt
 
 @BUILD_DARWIN_FALSE@$(OSX_DMG): $(APP_DIST_EXTRAS)
 @BUILD_DARWIN_FALSE@	$(GENISOIMAGE) -no-cache-inodes -D -l -probe -V "$(OSX_VOLNAME)" -no-pad -r -dir-mode 0755 -apple -o $@ dist
@@ -1299,63 +1269,48 @@ osx_volname:
 @BUILD_DARWIN_FALSE@$(APP_DIST_DIR)/.DS_Store: $(OSX_DSSTORE_GEN)
 @BUILD_DARWIN_FALSE@	$(PYTHON) $< "$@" "$(OSX_VOLNAME)"
 
-@BUILD_DARWIN_FALSE@$(APP_DIST_DIR)/$(OSX_APP)/Contents/MacOS/MindBlockchain-Qt: $(OSX_APP_BUILT) $(OSX_PACKAGING)
+@BUILD_DARWIN_FALSE@$(APP_DIST_DIR)/$(OSX_APP)/Contents/MacOS/Mindblockchain-Qt: $(OSX_APP_BUILT) $(OSX_PACKAGING)
 @BUILD_DARWIN_FALSE@	INSTALLNAMETOOL=$(INSTALLNAMETOOL)  OTOOL=$(OTOOL) STRIP=$(STRIP) $(PYTHON) $(OSX_DEPLOY_SCRIPT) $(OSX_APP) -translations-dir=$(QT_TRANSLATION_DIR) -add-qt-tr $(OSX_QT_TRANSLATIONS) -verbose 2
 
 @BUILD_DARWIN_FALSE@deploydir: $(APP_DIST_EXTRAS)
 
 @TARGET_DARWIN_TRUE@appbundle: $(OSX_APP_BUILT)
 @TARGET_DARWIN_TRUE@deploy: $(OSX_DMG)
-@TARGET_WINDOWS_TRUE@deploy: $(MINDBLOCKCHAIN_WIN_INSTALLER)
+@TARGET_WINDOWS_TRUE@deploy: $(BITCOIN_WIN_INSTALLER)
 
-$(MINDBLOCKCHAIN_QT_BIN): FORCE
+$(BITCOIN_QT_BIN): FORCE
 	$(MAKE) -C src qt/$(@F)
 
-$(MINDBLOCKCHAIND_BIN): FORCE
+$(BITCOIND_BIN): FORCE
 	$(MAKE) -C src $(@F)
 
-$(MINDBLOCKCHAIN_CLI_BIN): FORCE
+$(BITCOIN_CLI_BIN): FORCE
 	$(MAKE) -C src $(@F)
 
-$(MINDBLOCKCHAIN_TX_BIN): FORCE
+$(BITCOIN_TX_BIN): FORCE
 	$(MAKE) -C src $(@F)
 
-$(MINDBLOCKCHAIN_WALLET_BIN): FORCE
+$(BITCOIN_WALLET_BIN): FORCE
 	$(MAKE) -C src $(@F)
 
-@USE_LCOV_TRUE@DIR_FUZZ_SEED_CORPUS ?= qa-assets/fuzz_seed_corpus
-
-@USE_LCOV_TRUE@$(COV_TOOL_WRAPPER):
-@USE_LCOV_TRUE@	@echo 'exec $(COV_TOOL) "$$@"' > $(COV_TOOL_WRAPPER)
-@USE_LCOV_TRUE@	@chmod +x $(COV_TOOL_WRAPPER)
-
-@USE_LCOV_TRUE@baseline.info: $(COV_TOOL_WRAPPER)
+@USE_LCOV_TRUE@baseline.info:
 @USE_LCOV_TRUE@	$(LCOV) -c -i -d $(abs_builddir)/src -o $@
 
 @USE_LCOV_TRUE@baseline_filtered.info: baseline.info
 @USE_LCOV_TRUE@	$(abs_builddir)/contrib/filter-lcov.py $(LCOV_FILTER_PATTERN) $< $@
 @USE_LCOV_TRUE@	$(LCOV) -a $@ $(LCOV_OPTS) -o $@
 
-@USE_LCOV_TRUE@fuzz.info: baseline_filtered.info
-@USE_LCOV_TRUE@	@TIMEOUT=15 test/fuzz/test_runner.py $(DIR_FUZZ_SEED_CORPUS) -l DEBUG
-@USE_LCOV_TRUE@	$(LCOV) -c $(LCOV_OPTS) -d $(abs_builddir)/src --t fuzz-tests -o $@
-@USE_LCOV_TRUE@	$(LCOV) -z $(LCOV_OPTS) -d $(abs_builddir)/src
-
-@USE_LCOV_TRUE@fuzz_filtered.info: fuzz.info
-@USE_LCOV_TRUE@	$(abs_builddir)/contrib/filter-lcov.py $(LCOV_FILTER_PATTERN) $< $@
-@USE_LCOV_TRUE@	$(LCOV) -a $@ $(LCOV_OPTS) -o $@
-
-@USE_LCOV_TRUE@test_mindblockchain.info: baseline_filtered.info
+@USE_LCOV_TRUE@test_bitcoin.info: baseline_filtered.info
 @USE_LCOV_TRUE@	$(MAKE) -C src/ check
-@USE_LCOV_TRUE@	$(LCOV) -c $(LCOV_OPTS) -d $(abs_builddir)/src -t test_mindblockchain -o $@
+@USE_LCOV_TRUE@	$(LCOV) -c $(LCOV_OPTS) -d $(abs_builddir)/src -t test_bitcoin -o $@
 @USE_LCOV_TRUE@	$(LCOV) -z $(LCOV_OPTS) -d $(abs_builddir)/src
 
-@USE_LCOV_TRUE@test_mindblockchain_filtered.info: test_mindblockchain.info
+@USE_LCOV_TRUE@test_bitcoin_filtered.info: test_bitcoin.info
 @USE_LCOV_TRUE@	$(abs_builddir)/contrib/filter-lcov.py $(LCOV_FILTER_PATTERN) $< $@
 @USE_LCOV_TRUE@	$(LCOV) -a $@ $(LCOV_OPTS) -o $@
 
-@USE_LCOV_TRUE@functional_test.info: test_mindblockchain_filtered.info
-@USE_LCOV_TRUE@	@TIMEOUT=15 test/functional/test_runner.py $(EXTENDED_FUNCTIONAL_TESTS)
+@USE_LCOV_TRUE@functional_test.info: test_bitcoin_filtered.info
+@USE_LCOV_TRUE@	-@TIMEOUT=15 test/functional/test_runner.py $(EXTENDED_FUNCTIONAL_TESTS)
 @USE_LCOV_TRUE@	$(LCOV) -c $(LCOV_OPTS) -d $(abs_builddir)/src --t functional-tests -o $@
 @USE_LCOV_TRUE@	$(LCOV) -z $(LCOV_OPTS) -d $(abs_builddir)/src
 
@@ -1363,20 +1318,13 @@ $(MINDBLOCKCHAIN_WALLET_BIN): FORCE
 @USE_LCOV_TRUE@	$(abs_builddir)/contrib/filter-lcov.py $(LCOV_FILTER_PATTERN) $< $@
 @USE_LCOV_TRUE@	$(LCOV) -a $@ $(LCOV_OPTS) -o $@
 
-@USE_LCOV_TRUE@fuzz_coverage.info: fuzz_filtered.info
-@USE_LCOV_TRUE@	$(LCOV) -a $(LCOV_OPTS) baseline_filtered.info -a fuzz_filtered.info -o $@ | $(GREP) "\%" | $(AWK) '{ print substr($$3,2,50) "/" $$5 }' > coverage_percent.txt
+@USE_LCOV_TRUE@test_bitcoin_coverage.info: baseline_filtered.info test_bitcoin_filtered.info
+@USE_LCOV_TRUE@	$(LCOV) -a $(LCOV_OPTS) baseline_filtered.info -a test_bitcoin_filtered.info -o $@
 
-@USE_LCOV_TRUE@test_mindblockchain_coverage.info: baseline_filtered.info test_mindblockchain_filtered.info
-@USE_LCOV_TRUE@	$(LCOV) -a $(LCOV_OPTS) baseline_filtered.info -a test_mindblockchain_filtered.info -o $@
+@USE_LCOV_TRUE@total_coverage.info: test_bitcoin_filtered.info functional_test_filtered.info
+@USE_LCOV_TRUE@	$(LCOV) -a $(LCOV_OPTS) baseline_filtered.info -a test_bitcoin_filtered.info -a functional_test_filtered.info -o $@ | $(GREP) "\%" | $(AWK) '{ print substr($$3,2,50) "/" $$5 }' > coverage_percent.txt
 
-@USE_LCOV_TRUE@total_coverage.info: test_mindblockchain_filtered.info functional_test_filtered.info
-@USE_LCOV_TRUE@	$(LCOV) -a $(LCOV_OPTS) baseline_filtered.info -a test_mindblockchain_filtered.info -a functional_test_filtered.info -o $@ | $(GREP) "\%" | $(AWK) '{ print substr($$3,2,50) "/" $$5 }' > coverage_percent.txt
-
-@USE_LCOV_TRUE@fuzz.coverage/.dirstamp: fuzz_coverage.info
-@USE_LCOV_TRUE@	$(GENHTML) -s $(LCOV_OPTS) $< -o $(@D)
-@USE_LCOV_TRUE@	@touch $@
-
-@USE_LCOV_TRUE@test_mindblockchain.coverage/.dirstamp:  test_mindblockchain_coverage.info
+@USE_LCOV_TRUE@test_bitcoin.coverage/.dirstamp:  test_bitcoin_coverage.info
 @USE_LCOV_TRUE@	$(GENHTML) -s $(LCOV_OPTS) $< -o $(@D)
 @USE_LCOV_TRUE@	@touch $@
 
@@ -1384,9 +1332,7 @@ $(MINDBLOCKCHAIN_WALLET_BIN): FORCE
 @USE_LCOV_TRUE@	$(GENHTML) -s $(LCOV_OPTS) $< -o $(@D)
 @USE_LCOV_TRUE@	@touch $@
 
-@USE_LCOV_TRUE@cov_fuzz: fuzz.coverage/.dirstamp
-
-@USE_LCOV_TRUE@cov: test_mindblockchain.coverage/.dirstamp total.coverage/.dirstamp
+@USE_LCOV_TRUE@cov: test_bitcoin.coverage/.dirstamp total.coverage/.dirstamp
 
 .INTERMEDIATE: $(COVERAGE_INFO)
 
@@ -1403,14 +1349,8 @@ clean-docs:
 	rm -rf doc/doxygen
 
 clean-local: clean-docs
-	rm -rf coverage_percent.txt test_mindblockchain.coverage/ total.coverage/ fuzz.coverage/ test/tmp/ cache/ $(OSX_APP)
+	rm -rf coverage_percent.txt test_bitcoin.coverage/ total.coverage/ test/tmp/ cache/ $(OSX_APP)
 	rm -rf test/functional/__pycache__ test/functional/test_framework/__pycache__ test/cache share/rpcauth/__pycache__
-	rm -rf osx_volname dist/ dpi36.background.tiff dpi72.background.tiff
-
-test-security-check:
-@TARGET_DARWIN_TRUE@	$(AM_V_at) $(PYTHON) $(top_srcdir)/contrib/devtools/test-security-check.py TestSecurityChecks.test_MACHO
-@TARGET_WINDOWS_TRUE@	$(AM_V_at) $(PYTHON) $(top_srcdir)/contrib/devtools/test-security-check.py TestSecurityChecks.test_PE
-@TARGET_LINUX_TRUE@	$(AM_V_at) $(PYTHON) $(top_srcdir)/contrib/devtools/test-security-check.py TestSecurityChecks.test_ELF
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

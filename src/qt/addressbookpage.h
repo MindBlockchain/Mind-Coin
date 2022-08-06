@@ -2,8 +2,8 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef MINDBLOCKCHAIN_QT_ADDRESSBOOKPAGE_H
-#define MINDBLOCKCHAIN_QT_ADDRESSBOOKPAGE_H
+#ifndef BITCOIN_QT_ADDRESSBOOKPAGE_H
+#define BITCOIN_QT_ADDRESSBOOKPAGE_H
 
 #include <QDialog>
 
@@ -45,7 +45,7 @@ public:
     const QString &getReturnValue() const { return returnValue; }
 
 public Q_SLOTS:
-    void done(int retval) override;
+    void done(int retval);
 
 private:
     Ui::AddressBookPage *ui;
@@ -83,4 +83,4 @@ Q_SIGNALS:
     void sendCoins(QString addr);
 };
 
-#endif // MINDBLOCKCHAIN_QT_ADDRESSBOOKPAGE_H
+#endif // BITCOIN_QT_ADDRESSBOOKPAGE_H
